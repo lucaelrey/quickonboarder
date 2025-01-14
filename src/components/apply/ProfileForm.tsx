@@ -85,73 +85,73 @@ export const ProfileForm = ({ onProfileCreated }: { onProfileCreated: () => void
 
   return (
     <div className="space-y-8">
-      <Card className="max-w-2xl mx-auto">
-        <CardHeader>
-          <CardTitle>Profil erstellen</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+      {!showLogin ? (
+        <Card className="max-w-2xl mx-auto">
+          <CardHeader>
+            <CardTitle>Profil erstellen</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="firstName">Vorname</Label>
+                  <Input
+                    id="firstName"
+                    name="firstName"
+                    value={formData.firstName}
+                    onChange={handleInputChange}
+                    placeholder="Max"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="lastName">Nachname</Label>
+                  <Input
+                    id="lastName"
+                    name="lastName"
+                    value={formData.lastName}
+                    onChange={handleInputChange}
+                    placeholder="Mustermann"
+                  />
+                </div>
+              </div>
               <div className="space-y-2">
-                <Label htmlFor="firstName">Vorname</Label>
+                <Label htmlFor="email">E-Mail</Label>
                 <Input
-                  id="firstName"
-                  name="firstName"
-                  value={formData.firstName}
+                  id="email"
+                  name="email"
+                  type="email"
+                  value={formData.email}
                   onChange={handleInputChange}
-                  placeholder="Max"
+                  placeholder="max.mustermann@example.com"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="lastName">Nachname</Label>
+                <Label htmlFor="password">Passwort</Label>
                 <Input
-                  id="lastName"
-                  name="lastName"
-                  value={formData.lastName}
+                  id="password"
+                  name="password"
+                  type="password"
+                  value={formData.password}
                   onChange={handleInputChange}
-                  placeholder="Mustermann"
+                  placeholder="••••••••"
                 />
               </div>
+              <Button onClick={handleSubmit} className="w-full">
+                Profil erstellen
+              </Button>
+              <div className="text-center">
+                <button
+                  onClick={() => setShowLogin(true)}
+                  className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
+                  type="button"
+                >
+                  Du hast bereits einen Account? Jetzt anmelden
+                </button>
+              </div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="email">E-Mail</Label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                value={formData.email}
-                onChange={handleInputChange}
-                placeholder="max.mustermann@example.com"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Passwort</Label>
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                value={formData.password}
-                onChange={handleInputChange}
-                placeholder="••••••••"
-              />
-            </div>
-            <Button onClick={handleSubmit} className="w-full">
-              Profil erstellen
-            </Button>
-            <div className="text-center">
-              <button
-                onClick={() => setShowLogin(!showLogin)}
-                className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
-                type="button"
-              >
-                Du hast bereits einen Account? Jetzt anmelden
-              </button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {showLogin && (
+          </CardContent>
+        </Card>
+      ) : (
         <Card className="max-w-2xl mx-auto">
           <CardHeader>
             <CardTitle>Anmelden</CardTitle>
@@ -163,25 +163,56 @@ export const ProfileForm = ({ onProfileCreated }: { onProfileCreated: () => void
                 theme: ThemeSupa,
                 style: {
                   button: {
-                    background: 'rgb(var(--primary))',
+                    background: '#0077ff',
                     color: 'white',
                     width: '100%',
+                    borderRadius: '0.375rem',
+                    padding: '0.5rem 1rem',
+                    fontSize: '0.875rem',
+                    fontWeight: '500',
+                    '&:hover': {
+                      background: '#004aad',
+                    },
                   },
                   input: {
                     borderRadius: '0.375rem',
-                    border: '1px solid rgb(var(--input))',
+                    border: '1px solid #e2e8f0',
+                    padding: '0.5rem 1rem',
+                    fontSize: '0.875rem',
+                    width: '100%',
+                    marginBottom: '1rem',
                   },
                   label: {
-                    color: 'rgb(var(--foreground))',
+                    color: '#1a202c',
                     marginBottom: '0.5rem',
                     display: 'block',
+                    fontSize: '0.875rem',
+                    fontWeight: '500',
                   },
+                  container: {
+                    width: '100%',
+                  },
+                },
+                className: {
+                  container: 'space-y-4',
+                  button: 'w-full',
+                  input: 'w-full',
+                  label: 'block text-sm font-medium',
                 },
               }}
               theme="light"
               providers={[]}
               view="sign_in"
             />
+            <div className="text-center mt-4">
+              <button
+                onClick={() => setShowLogin(false)}
+                className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
+                type="button"
+              >
+                Zurück zur Registrierung
+              </button>
+            </div>
           </CardContent>
         </Card>
       )}
