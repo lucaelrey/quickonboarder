@@ -25,12 +25,26 @@ const Apply = () => {
           .from("profiles")
           .select("id")
           .eq("user_id", user.id)
-          .single();
+          .maybeSingle();
 
-        if (error) throw error;
+        if (error) {
+          console.error("Error fetching profile:", error);
+          toast({
+            title: "Fehler",
+            description: "Fehler beim Laden des Profils. Bitte versuchen Sie es später erneut.",
+            variant: "destructive",
+          });
+          return;
+        }
+
         setProfile(profile);
       } catch (error) {
         console.error("Error fetching profile:", error);
+        toast({
+          title: "Fehler",
+          description: "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.",
+          variant: "destructive",
+        });
       }
     };
 
@@ -46,7 +60,7 @@ const Apply = () => {
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [toast]);
 
   return (
     <div className="min-h-screen bg-gray-50">
