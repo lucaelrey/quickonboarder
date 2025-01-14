@@ -32,7 +32,7 @@ const Apply = () => {
       <div className="container mx-auto px-4 py-8">
         <Card className="max-w-2xl mx-auto">
           <CardHeader>
-            <CardTitle>Ihre Bewerbung</CardTitle>
+            <CardTitle>Deine Bewerbung</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="mb-6">

@@ -7,10 +7,10 @@ export const Hero = () => {
       <div className="container mx-auto px-4">
         <div className="max-w-3xl mx-auto text-center">
           <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
-            Starten Sie Ihre Karriere bei Quickmail
+            Starte deine Karriere bei Quickmail
           </h1>
           <p className="text-xl text-gray-600 mb-8">
-            Wir suchen talentierte Menschen, die mit uns die Zukunft gestalten möchten.
+            Wir suchen talentierte Menschen wie dich, die mit uns die Zukunft gestalten möchten.
           </p>
           <Link to="/apply">
             <Button size="lg" className="text-lg px-8">
