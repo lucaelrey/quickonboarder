@@ -18,7 +18,6 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const [application, setApplication] = useState<Application | null>(null);
   const [loading, setLoading] = useState(true);
-  const [showDetails, setShowDetails] = useState(false);
   const [userRole, setUserRole] = useState<UserRole>('bewerber');
   const { toast } = useToast();
 
@@ -104,10 +103,7 @@ const Dashboard = () => {
             </div>
           );
         }
-        return <ApplicantDashboard 
-          application={application} 
-          onViewDetails={() => setShowDetails(true)} 
-        />;
+        return <ApplicantDashboard application={application} />;
       
       case 'newcomer':
         return <NewcomerDashboard />;
