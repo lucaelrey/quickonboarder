@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { Navbar } from "@/components/layout/Navbar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard, FileText, Loader2, Calendar, Car, Briefcase, Globe2, ChevronRight } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { LayoutDashboard, FileText, Loader2, Calendar, Car, Briefcase, Globe2, ChevronRight, CheckCircle, AlertCircle, XCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 import { format } from "date-fns";
@@ -73,14 +74,34 @@ const Dashboard = () => {
     }
   };
 
+  const getStatusBadge = (status: Application['status']) => {
+    const statusConfig = {
+      eingereicht: { variant: 'default' as const, icon: FileText, label: 'Eingereicht' },
+      wird_geprueft: { variant: 'secondary' as const, icon: AlertCircle, label: 'Wird geprüft' },
+      angenommen: { variant: 'default' as const, icon: CheckCircle, label: 'Angenommen' },
+      abgelehnt: { variant: 'destructive' as const, icon: XCircle, label: 'Abgelehnt' }
+    };
+
+    const config = statusConfig[status];
+    const Icon = config.icon;
+
+    return (
+      <Badge variant={config.variant} className="flex items-center gap-1">
+        <Icon className="h-3 w-3" />
+        {config.label}
+      </Badge>
+    );
+  };
+
   const ApplicationCard = ({ application }: { application: Application }) => (
     <Card className="cursor-pointer hover:bg-gray-50 transition-colors" onClick={() => setShowDetails(true)}>
       <CardContent className="pt-6">
         <div className="flex justify-between items-center">
-          <div>
+          <div className="space-y-2">
             <h3 className="font-semibold">{application.first_name} {application.last_name}</h3>
             <p className="text-sm text-gray-500">{application.email}</p>
             <p className="text-sm text-gray-500">Eingereicht am: {formatDate(application.created_at)}</p>
+            {getStatusBadge(application.status)}
           </div>
           <ChevronRight className="h-5 w-5 text-gray-400" />
         </div>
@@ -122,6 +143,7 @@ const Dashboard = () => {
                   <Button variant="ghost" onClick={() => setShowDetails(false)}>
                     ← Zurück zur Übersicht
                   </Button>
+                  {getStatusBadge(application.status)}
                 </div>
                 
                 {/* Personal Information */}

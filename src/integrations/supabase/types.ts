@@ -38,6 +38,7 @@ export type Database = {
             | null
           profile_id: string | null
           salutation: string | null
+          status: Database["public"]["Enums"]["application_status"]
           street: string | null
           user_id: string | null
           vehicles: string[] | null
@@ -70,6 +71,7 @@ export type Database = {
             | null
           profile_id?: string | null
           salutation?: string | null
+          status?: Database["public"]["Enums"]["application_status"]
           street?: string | null
           user_id?: string | null
           vehicles?: string[] | null
@@ -102,6 +104,7 @@ export type Database = {
             | null
           profile_id?: string | null
           salutation?: string | null
+          status?: Database["public"]["Enums"]["application_status"]
           street?: string | null
           user_id?: string | null
           vehicles?: string[] | null
@@ -154,6 +157,11 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
+      application_status:
+        | "eingereicht"
+        | "wird_geprueft"
+        | "angenommen"
+        | "abgelehnt"
       civil_status:
         | "ledig"
         | "verheiratet"
