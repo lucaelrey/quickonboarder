@@ -57,7 +57,7 @@ export const Navbar = () => {
               </Button>
             </>
           ) : (
-            <Link to="/apply">
+            <Link to="/apply?form=login">
               <Button variant="default">Anmelden</Button>
             </Link>
           )}

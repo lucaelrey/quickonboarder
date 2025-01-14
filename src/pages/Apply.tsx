@@ -6,11 +6,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { ProfileForm } from "@/components/apply/ProfileForm";
 import { ApplicationSteps } from "@/components/apply/ApplicationSteps";
 import { Button } from "@/components/ui/button";
+import { useSearchParams } from "react-router-dom";
 
 const Apply = () => {
   const { toast } = useToast();
   const [profile, setProfile] = useState<{ id: string } | null>(null);
   const [showApplicationForm, setShowApplicationForm] = useState(false);
+  const [searchParams] = useSearchParams();
+  const [showLogin, setShowLogin] = useState(searchParams.get("form") === "login");
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -50,7 +53,10 @@ const Apply = () => {
       <Navbar />
       <div className="container mx-auto px-4 py-8">
         {!profile ? (
-          <ProfileForm onProfileCreated={() => window.location.reload()} />
+          <ProfileForm 
+            onProfileCreated={() => window.location.reload()} 
+            initialShowLogin={showLogin}
+          />
         ) : !showApplicationForm ? (
           <Card className="max-w-2xl mx-auto">
             <CardHeader>

@@ -3,8 +3,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RegistrationForm } from "./auth/RegistrationForm";
 import { LoginForm } from "./auth/LoginForm";
 
-export const ProfileForm = ({ onProfileCreated }: { onProfileCreated: () => void }) => {
-  const [showLogin, setShowLogin] = useState(false);
+export const ProfileForm = ({ 
+  onProfileCreated,
+  initialShowLogin = false
+}: { 
+  onProfileCreated: () => void;
+  initialShowLogin?: boolean;
+}) => {
+  const [showLogin, setShowLogin] = useState(initialShowLogin);
 
   return (
     <div className="space-y-8">
