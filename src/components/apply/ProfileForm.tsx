@@ -10,11 +10,11 @@ import { ThemeSupa } from "@supabase/auth-ui-shared";
 
 export const ProfileForm = ({ onProfileCreated }: { onProfileCreated: () => void }) => {
   const { toast } = useToast();
+  const [showLogin, setShowLogin] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
     email: "",
-    phone: "",
     password: "",
   });
 
@@ -27,7 +27,7 @@ export const ProfileForm = ({ onProfileCreated }: { onProfileCreated: () => void
   };
 
   const handleSubmit = async () => {
-    if (!formData.firstName || !formData.lastName || !formData.email || !formData.phone || !formData.password) {
+    if (!formData.firstName || !formData.lastName || !formData.email || !formData.password) {
       toast({
         title: "Fehler",
         description: "Bitte füllen Sie alle Pflichtfelder aus.",
@@ -63,7 +63,7 @@ export const ProfileForm = ({ onProfileCreated }: { onProfileCreated: () => void
           first_name: formData.firstName,
           last_name: formData.lastName,
           email: formData.email,
-          phone: formData.phone,
+          phone: "", // Set empty string as default
         });
 
       if (profileError) throw profileError;
@@ -135,38 +135,56 @@ export const ProfileForm = ({ onProfileCreated }: { onProfileCreated: () => void
                 placeholder="••••••••"
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="phone">Telefon</Label>
-              <Input
-                id="phone"
-                name="phone"
-                type="tel"
-                value={formData.phone}
-                onChange={handleInputChange}
-                placeholder="+49 123 456789"
-              />
-            </div>
             <Button onClick={handleSubmit} className="w-full">
               Profil erstellen
             </Button>
+            <div className="text-center">
+              <button
+                onClick={() => setShowLogin(!showLogin)}
+                className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
+                type="button"
+              >
+                Du hast bereits einen Account? Jetzt anmelden
+              </button>
+            </div>
           </div>
         </CardContent>
       </Card>
 
-      <Card className="max-w-2xl mx-auto">
-        <CardHeader>
-          <CardTitle>Bereits registriert?</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Auth
-            supabaseClient={supabase}
-            appearance={{ theme: ThemeSupa }}
-            theme="light"
-            providers={[]}
-            view="sign_in"
-          />
-        </CardContent>
-      </Card>
+      {showLogin && (
+        <Card className="max-w-2xl mx-auto">
+          <CardHeader>
+            <CardTitle>Anmelden</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Auth
+              supabaseClient={supabase}
+              appearance={{
+                theme: ThemeSupa,
+                style: {
+                  button: {
+                    background: 'rgb(var(--primary))',
+                    color: 'white',
+                    width: '100%',
+                  },
+                  input: {
+                    borderRadius: '0.375rem',
+                    border: '1px solid rgb(var(--input))',
+                  },
+                  label: {
+                    color: 'rgb(var(--foreground))',
+                    marginBottom: '0.5rem',
+                    display: 'block',
+                  },
+                },
+              }}
+              theme="light"
+              providers={[]}
+              view="sign_in"
+            />
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };
