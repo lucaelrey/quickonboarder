@@ -47,7 +47,23 @@ export const ApplicationSteps = ({ profileId }: { profileId: string }) => {
       setStep(step + 1);
     } else {
       try {
-        // First get the profile data to include required fields
+        // First get the authenticated user
+        const { data: { user }, error: authError } = await supabase.auth.getUser();
+        
+        if (authError) throw authError;
+        if (!user) {
+          toast({
+            title: "Fehler",
+            description: "Sie müssen angemeldet sein, um eine Bewerbung einzureichen.",
+            variant: "destructive",
+          });
+          navigate("/create-profile?form=login");
+          return;
+        }
+
+        console.log("Submitting application for user:", user.id);
+
+        // Then get the profile data to include required fields
         const { data: profileData, error: profileError } = await supabase
           .from('profiles')
           .select('first_name, last_name, email, phone')
@@ -59,6 +75,7 @@ export const ApplicationSteps = ({ profileId }: { profileId: string }) => {
 
         const applicationData: ApplicationInsert = {
           profile_id: profileId,
+          user_id: user.id, // Link the application to the authenticated user
           first_name: profileData.first_name,
           last_name: profileData.last_name,
           email: profileData.email,
@@ -85,11 +102,15 @@ export const ApplicationSteps = ({ profileId }: { profileId: string }) => {
           job_source: formData.jobSource,
         };
 
+        console.log("Submitting application data:", applicationData);
+
         const { error } = await supabase
           .from('applications')
           .insert(applicationData);
 
         if (error) throw error;
+
+        console.log("Application submitted successfully");
 
         toast({
           title: "Erfolg",
