@@ -46,6 +46,23 @@ export const RegistrationForm = ({ onShowLogin, onProfileCreated }: Registration
     }
 
     try {
+      // First check if a profile with this email already exists
+      const { data: existingProfile } = await supabase
+        .from("profiles")
+        .select("id")
+        .eq("email", formData.email)
+        .maybeSingle();
+
+      if (existingProfile) {
+        toast({
+          title: "Fehler",
+          description: "Diese E-Mail-Adresse ist bereits registriert. Bitte melden Sie sich stattdessen an.",
+          variant: "destructive",
+        });
+        onShowLogin();
+        return;
+      }
+
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
@@ -64,7 +81,6 @@ export const RegistrationForm = ({ onShowLogin, onProfileCreated }: Registration
           variant: "destructive",
         });
         
-        // If user already exists, show login form
         if (authError.message.includes("user_already_exists")) {
           onShowLogin();
         }
@@ -85,7 +101,10 @@ export const RegistrationForm = ({ onShowLogin, onProfileCreated }: Registration
           phone: "",
         });
 
-      if (profileError) throw profileError;
+      if (profileError) {
+        console.error("Error creating profile:", profileError);
+        throw profileError;
+      }
 
       toast({
         title: "Erfolg",
