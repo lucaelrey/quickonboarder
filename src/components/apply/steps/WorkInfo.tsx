@@ -145,11 +145,7 @@ export const WorkInfo = ({ formData, updateFormData }: WorkInfoProps) => {
                 <Checkbox
                   id={day}
                   checked={formData.availableWorkdays.includes(day)}
-                  onCheckedChange={(checked) => {
-                    if (checked) {
-                      handleCheckboxChange(day, "availableWorkdays");
-                    }
-                  }}
+                  onCheckedChange={() => handleCheckboxChange(day, "availableWorkdays")}
                 />
                 <Label htmlFor={day}>{day}</Label>
               </div>
@@ -165,11 +161,7 @@ export const WorkInfo = ({ formData, updateFormData }: WorkInfoProps) => {
                 <Checkbox
                   id={vehicle}
                   checked={formData.vehicles.includes(vehicle)}
-                  onCheckedChange={(checked) => {
-                    if (checked) {
-                      handleCheckboxChange(vehicle, "vehicles");
-                    }
-                  }}
+                  onCheckedChange={() => handleCheckboxChange(vehicle, "vehicles")}
                 />
                 <Label htmlFor={vehicle}>{vehicle}</Label>
               </div>
