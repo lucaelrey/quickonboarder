@@ -2,8 +2,9 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { AuthError } from "@supabase/supabase-js";
 
 interface RegistrationFormProps {
   onShowLogin: () => void;
@@ -25,6 +26,13 @@ export const RegistrationForm = ({ onShowLogin, onProfileCreated }: Registration
       ...prev,
       [name]: value,
     }));
+  };
+
+  const getErrorMessage = (error: AuthError) => {
+    if (error.message.includes("user_already_exists")) {
+      return "Diese E-Mail-Adresse ist bereits registriert. Bitte melden Sie sich stattdessen an.";
+    }
+    return "Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.";
   };
 
   const handleSubmit = async () => {
@@ -49,7 +57,19 @@ export const RegistrationForm = ({ onShowLogin, onProfileCreated }: Registration
         },
       });
 
-      if (authError) throw authError;
+      if (authError) {
+        toast({
+          title: "Fehler",
+          description: getErrorMessage(authError),
+          variant: "destructive",
+        });
+        
+        // If user already exists, show login form
+        if (authError.message.includes("user_already_exists")) {
+          onShowLogin();
+        }
+        return;
+      }
 
       if (!authData.user) {
         throw new Error("Benutzer konnte nicht erstellt werden.");
