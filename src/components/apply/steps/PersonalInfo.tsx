@@ -10,6 +10,7 @@ import { format } from "date-fns";
 import { de } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import countries from "@/data/countries.json";
+import { Separator } from "@/components/ui/separator";
 
 interface PersonalInfoProps {
   formData: any;
@@ -110,15 +111,16 @@ export const PersonalInfo = ({ formData, updateFormData }: PersonalInfoProps) =>
               <SelectValue placeholder="Bitte wählen" />
             </SelectTrigger>
             <SelectContent>
-              {countries.map((country) => (
-                country.code === "separator" ? (
-                  <SelectItem key="separator" value="" disabled className="h-[1px] my-2 bg-gray-200" />
-                ) : (
+              {countries.map((country) => {
+                if (country.code === "separator") {
+                  return <Separator className="my-2" />;
+                }
+                return (
                   <SelectItem key={country.code} value={country.name}>
                     {country.name}
                   </SelectItem>
-                )
-              ))}
+                );
+              })}
             </SelectContent>
           </Select>
         </div>
