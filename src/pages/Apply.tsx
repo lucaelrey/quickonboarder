@@ -5,7 +5,6 @@ import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { ProfileForm } from "@/components/apply/ProfileForm";
 import { ApplicationSteps } from "@/components/apply/ApplicationSteps";
-import { Button } from "@/components/ui/button";
 import { useSearchParams } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 
@@ -49,7 +48,7 @@ const Apply = () => {
           setShowApplicationForm(fromDashboard);
         }
       } catch (error) {
-        console.error("Error fetching profile:", error);
+        console.error("Error:", error);
         toast({
           title: "Fehler",
           description: "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.",
@@ -61,17 +60,6 @@ const Apply = () => {
     };
 
     fetchProfile();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN') {
-        fetchProfile();
-      } else if (event === 'SIGNED_OUT') {
-        setProfile(null);
-        setShowApplicationForm(false);
-      }
-    });
-
-    return () => subscription.unsubscribe();
   }, [toast]);
 
   if (loading) {
@@ -103,9 +91,12 @@ const Apply = () => {
               <p className="mb-4">
                 Ihr Profil wurde erfolgreich erstellt. Sie können nun mit dem Bewerbungsprozess fortfahren.
               </p>
-              <Button onClick={() => setShowApplicationForm(true)} className="w-full">
+              <button
+                onClick={() => setShowApplicationForm(true)}
+                className="w-full bg-primary text-white px-4 py-2 rounded hover:bg-primary/90 transition-colors"
+              >
                 Bewerbung starten
-              </Button>
+              </button>
             </CardContent>
           </Card>
         ) : (
