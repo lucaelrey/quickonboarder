@@ -30,7 +30,7 @@ export const Navbar = () => {
   };
 
   return (
-    <nav className="border-b bg-transparent">
+    <nav className="bg-transparent">
       <div className="container mx-auto px-4 flex flex-col md:flex-row items-center">
         <div className="w-full flex justify-center">
           <Link to="/" className="flex items-center justify-center">
