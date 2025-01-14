@@ -22,7 +22,7 @@ export const LoginForm = ({ onShowRegistration }: LoginFormProps) => {
               padding: '0.5rem 1rem',
               fontSize: '0.875rem',
               fontWeight: '500',
-              '&:hover': {
+              ':hover': {
                 background: '#004aad',
               },
             },
