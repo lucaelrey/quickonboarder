@@ -2,6 +2,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
+import { useEffect } from "react";
 
 interface LoginFormProps {
   onShowRegistration: () => void;
@@ -10,14 +11,19 @@ interface LoginFormProps {
 export const LoginForm = ({ onShowRegistration }: LoginFormProps) => {
   const { toast } = useToast();
 
-  const handleError = (error: Error) => {
-    toast({
-      title: "Fehler",
-      description: "Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.",
-      variant: "destructive",
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'AUTH_ERROR') {
+        toast({
+          title: "Fehler",
+          description: "Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.",
+          variant: "destructive",
+        });
+      }
     });
-    console.error("Auth error:", error);
-  };
+
+    return () => subscription.unsubscribe();
+  }, [toast]);
 
   return (
     <div className="space-y-4">
@@ -78,7 +84,6 @@ export const LoginForm = ({ onShowRegistration }: LoginFormProps) => {
         }}
         theme="light"
         providers={[]}
-        onError={handleError}
       />
       <div className="text-center mt-4">
         <button
