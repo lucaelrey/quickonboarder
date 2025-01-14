@@ -18,19 +18,23 @@ const Dashboard = () => {
     const fetchApplication = async () => {
       try {
         const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
+        if (!user) {
+          navigate('/apply?form=login');
+          return;
+        }
 
-        const { data: application, error } = await supabase
+        const { data, error } = await supabase
           .from('applications')
           .select('*')
           .eq('user_id', user.id)
-          .single();
+          .maybeSingle();
 
         if (error && error.code !== 'PGRST116') {
           console.error("Error fetching application:", error);
+          return;
         }
 
-        setApplication(application);
+        setApplication(data);
       } catch (error) {
         console.error("Error:", error);
       } finally {
@@ -39,7 +43,7 @@ const Dashboard = () => {
     };
 
     fetchApplication();
-  }, []);
+  }, [navigate]);
 
   if (loading) {
     return (
