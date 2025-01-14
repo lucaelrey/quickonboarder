@@ -3,7 +3,7 @@ import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect } from "react";
-import { AuthError } from "@supabase/supabase-js";
+import { useNavigate } from "react-router-dom";
 
 interface LoginFormProps {
   onShowRegistration: () => void;
@@ -11,6 +11,7 @@ interface LoginFormProps {
 
 export const LoginForm = ({ onShowRegistration }: LoginFormProps) => {
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
@@ -19,18 +20,17 @@ export const LoginForm = ({ onShowRegistration }: LoginFormProps) => {
           title: "Erfolgreich angemeldet",
           description: "Sie wurden erfolgreich angemeldet.",
         });
+        navigate("/dashboard");
       } else if (event === "SIGNED_OUT") {
         toast({
           title: "Abgemeldet",
           description: "Sie wurden erfolgreich abgemeldet.",
         });
-      } else if (event === "TOKEN_REFRESHED" || event === "PASSWORD_RECOVERY") {
-        // Handle other auth events if needed
       }
     });
 
     return () => subscription.unsubscribe();
-  }, [toast]);
+  }, [toast, navigate]);
 
   return (
     <div className="space-y-4">
