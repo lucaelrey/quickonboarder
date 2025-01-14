@@ -1,53 +1,50 @@
+import { useToast } from "@/components/ui/use-toast";
 import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 
 interface LoginFormProps {
   onShowRegistration: () => void;
 }
 
 export const LoginForm = ({ onShowRegistration }: LoginFormProps) => {
-  const navigate = useNavigate();
+  const { toast } = useToast();
 
-  useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN' && session) {
-        navigate('/dashboard');
-      }
+  const handleError = (error: Error) => {
+    toast({
+      title: "Fehler",
+      description: "Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.",
+      variant: "destructive",
     });
-
-    return () => subscription.unsubscribe();
-  }, [navigate]);
+    console.error("Auth error:", error);
+  };
 
   return (
     <div className="space-y-4">
       <Auth
         supabaseClient={supabase}
         appearance={{
-          theme: ThemeSupa,
           style: {
             button: {
               background: '#0077ff',
               color: 'white',
               width: '100%',
               borderRadius: '0.75rem',
-              padding: '0.5rem 1rem',
+              padding: '0.75rem 1rem',
               fontSize: '0.875rem',
               lineHeight: '1.25rem',
               fontWeight: '500',
-              height: '40px',
+              height: '2.5rem',
             },
             input: {
               borderRadius: '0.75rem',
               border: '1px solid #e2e8f0',
-              padding: '0.5rem 1rem',
+              padding: '0.75rem 1rem',
               fontSize: '0.875rem',
               lineHeight: '1.25rem',
               width: '100%',
               marginBottom: '1rem',
-              height: '40px',
+              height: '2.5rem',
             },
             label: {
               color: '#1a202c',
@@ -59,6 +56,7 @@ export const LoginForm = ({ onShowRegistration }: LoginFormProps) => {
             },
             container: {
               width: '100%',
+              marginBottom: '1rem',
             },
             message: {
               fontSize: '0.875rem',
@@ -80,19 +78,7 @@ export const LoginForm = ({ onShowRegistration }: LoginFormProps) => {
         }}
         theme="light"
         providers={[]}
-        view="sign_in"
-        localization={{
-          variables: {
-            sign_in: {
-              email_label: 'E-Mail',
-              password_label: 'Passwort',
-              button_label: 'Anmelden',
-              loading_button_label: 'Anmeldung läuft...',
-              social_provider_text: 'Anmelden mit {{provider}}',
-              link_text: '',
-            },
-          },
-        }}
+        onError={handleError}
       />
       <div className="text-center mt-4">
         <button
