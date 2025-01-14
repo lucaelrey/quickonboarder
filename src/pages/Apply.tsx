@@ -147,7 +147,6 @@ const Apply = () => {
         const { error } = await supabase
           .from("applications")
           .insert({
-            user_id: user.id,
             first_name: formData.firstName,
             last_name: formData.lastName,
             email: formData.email,
