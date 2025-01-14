@@ -22,9 +22,6 @@ export const LoginForm = ({ onShowRegistration }: LoginFormProps) => {
               padding: '0.5rem 1rem',
               fontSize: '0.875rem',
               fontWeight: '500',
-              ':hover': {
-                background: '#004aad',
-              },
             },
             input: {
               borderRadius: '0.375rem',
@@ -47,7 +44,7 @@ export const LoginForm = ({ onShowRegistration }: LoginFormProps) => {
           },
           className: {
             container: 'space-y-4',
-            button: 'w-full',
+            button: 'w-full hover:bg-blue-700',
             input: 'w-full',
             label: 'block text-sm font-medium',
           },
