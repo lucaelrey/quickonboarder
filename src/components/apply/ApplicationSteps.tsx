@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { PersonalInfo } from "./steps/PersonalInfo";
@@ -11,6 +12,7 @@ import type { Database } from "@/integrations/supabase/types";
 type ApplicationInsert = Database['public']['Tables']['applications']['Insert'];
 
 export const ApplicationSteps = ({ profileId }: { profileId: string }) => {
+  const navigate = useNavigate();
   const { toast } = useToast();
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
@@ -93,6 +95,8 @@ export const ApplicationSteps = ({ profileId }: { profileId: string }) => {
           title: "Erfolg",
           description: "Ihre Bewerbung wurde erfolgreich eingereicht.",
         });
+        
+        navigate("/application-confirmation");
       } catch (error) {
         console.error("Error submitting application:", error);
         toast({
