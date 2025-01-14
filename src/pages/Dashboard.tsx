@@ -2,26 +2,26 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Navbar } from "@/components/layout/Navbar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { LayoutDashboard, FileText, Loader2, Calendar, Car, Briefcase, Globe2, ChevronRight, CheckCircle, AlertCircle, XCircle } from "lucide-react";
+import { Loader2, LayoutDashboard } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
-import { format } from "date-fns";
-import { de } from "date-fns/locale";
 import { useToast } from "@/components/ui/use-toast";
+import { ApplicantDashboard } from "@/components/dashboard/ApplicantDashboard";
+import { NewcomerDashboard } from "@/components/dashboard/NewcomerDashboard";
+import { EmployeeDashboard } from "@/components/dashboard/EmployeeDashboard";
 
 type Application = Database['public']['Tables']['applications']['Row'];
+type Profile = Database['public']['Tables']['profiles']['Row'];
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const [application, setApplication] = useState<Application | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
-  const [showDetails, setShowDetails] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
-    const fetchApplication = async () => {
+    const fetchUserData = async () => {
       try {
         const { data: { user } } = await supabase.auth.getUser();
         
@@ -31,25 +31,45 @@ const Dashboard = () => {
           return;
         }
 
-        console.log("Fetching application for user:", user.id);
-        const { data, error } = await supabase
-          .from('applications')
+        // Fetch profile first to get user status
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
           .select('*')
           .eq('user_id', user.id)
-          .maybeSingle();
+          .single();
 
-        if (error) {
-          console.error("Error fetching application:", error);
+        if (profileError) {
+          console.error("Error fetching profile:", profileError);
           toast({
             title: "Fehler beim Laden",
-            description: "Ihre Bewerbung konnte nicht geladen werden. Bitte versuchen Sie es später erneut.",
+            description: "Ihr Profil konnte nicht geladen werden. Bitte versuchen Sie es später erneut.",
             variant: "destructive",
           });
           return;
         }
 
-        console.log("Fetched application data:", data);
-        setApplication(data);
+        setProfile(profileData);
+
+        // Only fetch application if user is an applicant
+        if (profileData.status === 'bewerber') {
+          const { data: applicationData, error: applicationError } = await supabase
+            .from('applications')
+            .select('*')
+            .eq('user_id', user.id)
+            .maybeSingle();
+
+          if (applicationError) {
+            console.error("Error fetching application:", applicationError);
+            toast({
+              title: "Fehler beim Laden",
+              description: "Ihre Bewerbung konnte nicht geladen werden. Bitte versuchen Sie es später erneut.",
+              variant: "destructive",
+            });
+            return;
+          }
+
+          setApplication(applicationData);
+        }
       } catch (error) {
         console.error("Error:", error);
         toast({
@@ -62,52 +82,40 @@ const Dashboard = () => {
       }
     };
 
-    fetchApplication();
+    fetchUserData();
   }, [navigate, toast]);
 
-  const formatDate = (dateString: string | null) => {
-    if (!dateString) return "-";
-    try {
-      return format(new Date(dateString), "dd.MM.yyyy", { locale: de });
-    } catch {
-      return dateString;
+  const renderDashboardContent = () => {
+    if (!profile) return null;
+
+    switch (profile.status) {
+      case 'bewerber':
+        return application ? <ApplicantDashboard application={application} /> : (
+          <div className="text-center py-8">
+            <p className="mb-4">Sie haben noch keine Bewerbung eingereicht.</p>
+            <Button onClick={() => navigate("/apply?from=dashboard")}>
+              Jetzt bewerben
+            </Button>
+          </div>
+        );
+      case 'newcomer':
+        return <NewcomerDashboard />;
+      case 'mitarbeiter':
+        return <EmployeeDashboard />;
+      case 'gekuendigt':
+        return (
+          <Card>
+            <CardContent className="pt-6">
+              <p className="text-center text-gray-500">
+                Ihr Zugang wurde deaktiviert.
+              </p>
+            </CardContent>
+          </Card>
+        );
+      default:
+        return null;
     }
   };
-
-  const getStatusBadge = (status: Application['status']) => {
-    const statusConfig = {
-      eingereicht: { variant: 'default' as const, icon: FileText, label: 'Eingereicht' },
-      wird_geprueft: { variant: 'secondary' as const, icon: AlertCircle, label: 'Wird geprüft' },
-      angenommen: { variant: 'default' as const, icon: CheckCircle, label: 'Angenommen' },
-      abgelehnt: { variant: 'destructive' as const, icon: XCircle, label: 'Abgelehnt' }
-    };
-
-    const config = statusConfig[status];
-    const Icon = config.icon;
-
-    return (
-      <Badge variant={config.variant} className="flex items-center gap-1">
-        <Icon className="h-3 w-3" />
-        {config.label}
-      </Badge>
-    );
-  };
-
-  const ApplicationCard = ({ application }: { application: Application }) => (
-    <Card className="cursor-pointer hover:bg-gray-50 transition-colors" onClick={() => setShowDetails(true)}>
-      <CardContent className="pt-6">
-        <div className="flex justify-between items-center">
-          <div className="space-y-2">
-            <h3 className="font-semibold">{application.first_name} {application.last_name}</h3>
-            <p className="text-sm text-gray-500">{application.email}</p>
-            <p className="text-sm text-gray-500">Eingereicht am: {formatDate(application.created_at)}</p>
-            {getStatusBadge(application.status)}
-          </div>
-          <ChevronRight className="h-5 w-5 text-gray-400" />
-        </div>
-      </CardContent>
-    </Card>
-  );
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -125,149 +133,8 @@ const Dashboard = () => {
               <div className="flex justify-center items-center py-8">
                 <Loader2 className="h-8 w-8 animate-spin" />
               </div>
-            ) : !application ? (
-              <div className="text-center py-8">
-                <p className="mb-4">Sie haben noch keine Bewerbung eingereicht.</p>
-                <Button onClick={() => navigate("/apply?from=dashboard")}>
-                  Jetzt bewerben
-                </Button>
-              </div>
-            ) : !showDetails ? (
-              <div className="space-y-4">
-                <h2 className="text-lg font-semibold mb-4">Ihre Bewerbungen</h2>
-                <ApplicationCard application={application} />
-              </div>
             ) : (
-              <div className="space-y-8">
-                <div className="flex justify-between items-center">
-                  <Button variant="ghost" onClick={() => setShowDetails(false)}>
-                    ← Zurück zur Übersicht
-                  </Button>
-                  {getStatusBadge(application.status)}
-                </div>
-                
-                {/* Personal Information */}
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2">
-                    <FileText className="h-5 w-5" />
-                    <h3 className="text-lg font-semibold">Persönliche Informationen</h3>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <p className="text-sm text-gray-500">Name</p>
-                      <p>{application.salutation} {application.first_name} {application.last_name}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Zivilstand</p>
-                      <p>{application.civil_status || "-"}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Geburtsdatum</p>
-                      <p>{formatDate(application.birth_date)}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Nationalität</p>
-                      <p>{application.nationality || "-"}</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Contact Information */}
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2">
-                    <Globe2 className="h-5 w-5" />
-                    <h3 className="text-lg font-semibold">Kontakt & Sprachen</h3>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <p className="text-sm text-gray-500">Kontakt</p>
-                      <p>{application.email}</p>
-                      <p>{application.phone}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Bevorzugte Sprache</p>
-                      <p>{application.preferred_language || "-"}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Sprachkenntnisse</p>
-                      <p>Deutsch: {application.german_level || "-"}</p>
-                      <p>Französisch: {application.french_level || "-"}</p>
-                      <p>Italienisch: {application.italian_level || "-"}</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Address */}
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2">
-                    <FileText className="h-5 w-5" />
-                    <h3 className="text-lg font-semibold">Adresse</h3>
-                  </div>
-                  <div>
-                    <p>{application.street} {application.house_number}</p>
-                    {application.address_addition && <p>{application.address_addition}</p>}
-                    <p>{application.postal_code} {application.city}</p>
-                  </div>
-                </div>
-
-                {/* Work Information */}
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2">
-                    <Briefcase className="h-5 w-5" />
-                    <h3 className="text-lg font-semibold">Arbeit</h3>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <p className="text-sm text-gray-500">Aktuelle Beschäftigung</p>
-                      <p>{application.current_occupation || "-"}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Gewünschtes Arbeitspensum</p>
-                      <p>Minimum: {application.min_workload || "-"}</p>
-                      <p>Maximum: {application.max_workload || "-"}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Verfügbare Arbeitstage</p>
-                      <ul className="list-disc list-inside">
-                        {application.available_workdays?.map((day) => (
-                          <li key={day}>{day}</li>
-                        )) || <p>-</p>}
-                      </ul>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Erfahrung als Zusteller:in</p>
-                      <p>{application.has_delivery_experience ? "Ja" : "Nein"}</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Vehicles */}
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2">
-                    <Car className="h-5 w-5" />
-                    <h3 className="text-lg font-semibold">Fahrzeuge</h3>
-                  </div>
-                  <div>
-                    <ul className="list-disc list-inside">
-                      {application.vehicles?.map((vehicle) => (
-                        <li key={vehicle}>{vehicle}</li>
-                      )) || <p>-</p>}
-                    </ul>
-                  </div>
-                </div>
-
-                {/* Source */}
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2">
-                    <FileText className="h-5 w-5" />
-                    <h3 className="text-lg font-semibold">Quelle</h3>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500">Wie haben Sie von uns erfahren?</p>
-                    <p>{application.job_source || "-"}</p>
-                  </div>
-                </div>
-              </div>
+              renderDashboardContent()
             )}
           </CardContent>
         </Card>
