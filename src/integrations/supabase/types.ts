@@ -9,7 +9,66 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      applications: {
+        Row: {
+          birth_date: string | null
+          civil_status: Database["public"]["Enums"]["civil_status"] | null
+          created_at: string | null
+          email: string
+          first_name: string
+          french_level: Database["public"]["Enums"]["language_level"] | null
+          german_level: Database["public"]["Enums"]["language_level"] | null
+          id: string
+          italian_level: Database["public"]["Enums"]["language_level"] | null
+          last_name: string
+          nationality: string | null
+          phone: string
+          preferred_language:
+            | Database["public"]["Enums"]["preferred_language"]
+            | null
+          salutation: string | null
+          user_id: string | null
+        }
+        Insert: {
+          birth_date?: string | null
+          civil_status?: Database["public"]["Enums"]["civil_status"] | null
+          created_at?: string | null
+          email: string
+          first_name: string
+          french_level?: Database["public"]["Enums"]["language_level"] | null
+          german_level?: Database["public"]["Enums"]["language_level"] | null
+          id?: string
+          italian_level?: Database["public"]["Enums"]["language_level"] | null
+          last_name: string
+          nationality?: string | null
+          phone: string
+          preferred_language?:
+            | Database["public"]["Enums"]["preferred_language"]
+            | null
+          salutation?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          birth_date?: string | null
+          civil_status?: Database["public"]["Enums"]["civil_status"] | null
+          created_at?: string | null
+          email?: string
+          first_name?: string
+          french_level?: Database["public"]["Enums"]["language_level"] | null
+          german_level?: Database["public"]["Enums"]["language_level"] | null
+          id?: string
+          italian_level?: Database["public"]["Enums"]["language_level"] | null
+          last_name?: string
+          nationality?: string | null
+          phone?: string
+          preferred_language?:
+            | Database["public"]["Enums"]["preferred_language"]
+            | null
+          salutation?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -18,7 +77,20 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      civil_status:
+        | "ledig"
+        | "verheiratet"
+        | "verwitwet"
+        | "geschieden"
+        | "getrennt"
+        | "eingetragene Partnerschaft"
+      language_level:
+        | "Sehr gut (Muttersprache)"
+        | "Gut"
+        | "Befriedigend"
+        | "Ein wenig"
+        | "Keine"
+      preferred_language: "Deutsch" | "Französisch" | "Italienisch" | "Andere"
     }
     CompositeTypes: {
       [_ in never]: never
