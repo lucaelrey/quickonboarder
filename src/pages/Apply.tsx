@@ -16,14 +16,7 @@ const Apply = () => {
     const fetchProfile = async () => {
       try {
         const { data: { user } } = await supabase.auth.getUser();
-        if (!user) {
-          toast({
-            title: "Fehler",
-            description: "Sie müssen eingeloggt sein, um sich zu bewerben.",
-            variant: "destructive",
-          });
-          return;
-        }
+        if (!user) return;
 
         const { data: profile, error } = await supabase
           .from("profiles")
@@ -39,7 +32,18 @@ const Apply = () => {
     };
 
     fetchProfile();
-  }, [toast]);
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN') {
+        fetchProfile();
+      } else if (event === 'SIGNED_OUT') {
+        setProfile(null);
+        setShowApplicationForm(false);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50">
