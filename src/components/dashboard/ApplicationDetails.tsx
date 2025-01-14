@@ -2,7 +2,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { de } from "date-fns/locale";
+import { ChevronLeft, User, Phone, MapPin, Globe, Briefcase } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 
 type Application = Database['public']['Tables']['applications']['Row'];
 
@@ -21,102 +24,117 @@ export const ApplicationDetails = ({ application, onBack }: ApplicationDetailsPr
     }
   };
 
+  const Section = ({ icon: Icon, title, children }: { icon: any, title: string, children: React.ReactNode }) => (
+    <div className="space-y-4">
+      <div className="flex items-center gap-2 text-lg font-semibold text-primary">
+        <Icon className="h-5 w-5" />
+        <h3>{title}</h3>
+      </div>
+      <div className="pl-7">
+        {children}
+      </div>
+    </div>
+  );
+
+  const Field = ({ label, value }: { label: string, value: string | null | undefined }) => (
+    <div className="grid grid-cols-2 gap-2 py-1">
+      <span className="text-muted-foreground">{label}</span>
+      <span>{value || "-"}</span>
+    </div>
+  );
+
+  const ListField = ({ label, items }: { label: string, items: string[] | null | undefined }) => (
+    <div className="py-1">
+      <span className="text-muted-foreground block mb-1">{label}</span>
+      <div className="flex flex-wrap gap-2">
+        {items?.map((item) => (
+          <Badge key={item} variant="secondary">{item}</Badge>
+        ))}
+      </div>
+    </div>
+  );
+
   return (
     <div className="space-y-6">
-      <button
+      <Button
+        variant="ghost"
         onClick={onBack}
-        className="text-sm text-blue-600 hover:text-blue-800 hover:underline flex items-center gap-2"
+        className="flex items-center gap-2 text-primary hover:text-primary/80"
       >
-        ← Zurück zur Übersicht
-      </button>
+        <ChevronLeft className="h-4 w-4" />
+        Zurück zur Übersicht
+      </Button>
 
       <Card>
-        <CardHeader>
-          <CardTitle>Bewerbungsdetails</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="grid grid-cols-2 gap-4">
+        <CardHeader className="pb-2">
+          <div className="flex items-start justify-between">
             <div>
-              <h3 className="font-semibold mb-2">Persönliche Informationen</h3>
-              <div className="space-y-2">
-                <p><span className="text-gray-600">Anrede:</span> {application.salutation}</p>
-                <p><span className="text-gray-600">Name:</span> {application.first_name} {application.last_name}</p>
-                <p><span className="text-gray-600">Geburtstag:</span> {formatDate(application.birth_date)}</p>
-                <p><span className="text-gray-600">Nationalität:</span> {application.nationality}</p>
-                <p><span className="text-gray-600">Zivilstand:</span> {application.civil_status}</p>
-              </div>
+              <CardTitle className="text-2xl">
+                {application.first_name} {application.last_name}
+              </CardTitle>
+              <p className="text-muted-foreground mt-1">
+                Eingereicht am {formatDate(application.created_at)}
+              </p>
             </div>
-            <div>
-              <h3 className="font-semibold mb-2">Kontaktinformationen</h3>
-              <div className="space-y-2">
-                <p><span className="text-gray-600">E-Mail:</span> {application.email}</p>
-                <p><span className="text-gray-600">Telefon:</span> {application.phone}</p>
-              </div>
-            </div>
+            <Badge className="capitalize">{application.status}</Badge>
           </div>
+        </CardHeader>
 
-          <div>
-            <h3 className="font-semibold mb-2">Adresse</h3>
-            <div className="space-y-2">
+        <CardContent className="space-y-8">
+          <Section icon={User} title="Persönliche Informationen">
+            <Field label="Anrede" value={application.salutation} />
+            <Field label="Geburtstag" value={formatDate(application.birth_date)} />
+            <Field label="Nationalität" value={application.nationality} />
+            <Field label="Zivilstand" value={application.civil_status} />
+          </Section>
+
+          <Separator />
+
+          <Section icon={Phone} title="Kontaktinformationen">
+            <Field label="E-Mail" value={application.email} />
+            <Field label="Telefon" value={application.phone} />
+          </Section>
+
+          <Separator />
+
+          <Section icon={MapPin} title="Adresse">
+            <div className="space-y-1">
               <p>
                 {application.street} {application.house_number}
                 {application.address_addition && `, ${application.address_addition}`}
               </p>
               <p>{application.postal_code} {application.city}</p>
             </div>
-          </div>
+          </Section>
 
-          <div>
-            <h3 className="font-semibold mb-2">Sprachkenntnisse</h3>
-            <div className="space-y-2">
-              <p><span className="text-gray-600">Bevorzugte Sprache:</span> {application.preferred_language}</p>
-              <p><span className="text-gray-600">Deutsch:</span> {application.german_level}</p>
-              <p><span className="text-gray-600">Französisch:</span> {application.french_level}</p>
-              <p><span className="text-gray-600">Italienisch:</span> {application.italian_level}</p>
-            </div>
-          </div>
+          <Separator />
 
-          <div>
-            <h3 className="font-semibold mb-2">Arbeitsinformationen</h3>
-            <div className="space-y-2">
-              <p><span className="text-gray-600">Aktuelle Beschäftigung:</span> {application.current_occupation}</p>
-              <p><span className="text-gray-600">Gewünschtes Arbeitspensum:</span> {application.min_workload} bis {application.max_workload}</p>
-              <div>
-                <span className="text-gray-600">Verfügbare Arbeitstage:</span>
-                <ul className="list-disc list-inside mt-1">
-                  {application.available_workdays?.map((day) => (
-                    <li key={day}>{day}</li>
-                  ))}
-                </ul>
-              </div>
-              <div>
-                <span className="text-gray-600">Verfügbare Fahrzeuge:</span>
-                <ul className="list-disc list-inside mt-1">
-                  {application.vehicles?.map((vehicle) => (
-                    <li key={vehicle}>{vehicle}</li>
-                  ))}
-                </ul>
-              </div>
-              <p>
-                <span className="text-gray-600">Zustellerfahrung:</span>{" "}
-                {application.has_delivery_experience ? "Ja" : "Nein"}
-              </p>
-              <p><span className="text-gray-600">Wie auf uns aufmerksam geworden:</span> {application.job_source}</p>
-            </div>
-          </div>
+          <Section icon={Globe} title="Sprachkenntnisse">
+            <Field label="Bevorzugte Sprache" value={application.preferred_language} />
+            <Field label="Deutsch" value={application.german_level} />
+            <Field label="Französisch" value={application.french_level} />
+            <Field label="Italienisch" value={application.italian_level} />
+          </Section>
 
-          <div>
-            <h3 className="font-semibold mb-2">Bewerbungsstatus</h3>
-            <div className="space-y-2">
-              <p><span className="text-gray-600">Eingereicht am:</span> {formatDate(application.created_at)}</p>
-              <p>
-                <span className="text-gray-600">Status:</span>{" "}
-                <Badge variant="outline" className="ml-2">
-                  {application.status}
-                </Badge>
-              </p>
+          <Separator />
+
+          <Section icon={Briefcase} title="Arbeitsinformationen">
+            <Field label="Aktuelle Beschäftigung" value={application.current_occupation} />
+            <div className="grid grid-cols-2 gap-2 py-1">
+              <span className="text-muted-foreground">Gewünschtes Arbeitspensum</span>
+              <span>{application.min_workload} bis {application.max_workload}</span>
             </div>
-          </div>
+            <ListField label="Verfügbare Arbeitstage" items={application.available_workdays} />
+            <ListField label="Verfügbare Fahrzeuge" items={application.vehicles} />
+            <Field 
+              label="Zustellerfahrung" 
+              value={application.has_delivery_experience ? "Ja" : "Nein"} 
+            />
+            <Field 
+              label="Wie auf uns aufmerksam geworden" 
+              value={application.job_source} 
+            />
+          </Section>
         </CardContent>
       </Card>
     </div>
