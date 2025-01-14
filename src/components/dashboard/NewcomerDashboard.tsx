@@ -1,7 +1,33 @@
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { FileText, BookOpen, Building } from "lucide-react";
+import { OnboardingIntro } from "@/components/onboarding/OnboardingIntro";
+import { OnboardingProgress } from "@/components/onboarding/OnboardingProgress";
 
 export const NewcomerDashboard = () => {
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [onboardingStep, setOnboardingStep] = useState(0);
+  const totalSteps = 4; // Update this as we add more chapters
+
+  const handleStartOnboarding = () => {
+    setShowOnboarding(true);
+  };
+
+  const handleCompleteIntro = () => {
+    setOnboardingStep(1);
+    // Here we'll later add logic to proceed to the next chapter
+  };
+
+  if (showOnboarding) {
+    return (
+      <div className="space-y-6">
+        <OnboardingProgress current={onboardingStep} total={totalSteps} />
+        <OnboardingIntro onComplete={handleCompleteIntro} />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <Card>
@@ -13,11 +39,13 @@ export const NewcomerDashboard = () => {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            <h3 className="font-medium">Willkommen im Team!</h3>
+            <h3 className="font-medium">Willkommen bei Quickmail!</h3>
             <p className="text-gray-600">
-              Hier finden Sie alle wichtigen Informationen für Ihren Start bei uns.
+              In diesem Kapitel erfährst du, was deine Aufgabe bei Quickmail ist und an wen du dich bei Fragen wenden kannst.
             </p>
-            {/* Add onboarding steps/content here */}
+            <Button onClick={handleStartOnboarding} className="w-full">
+              Los geht's
+            </Button>
           </div>
         </CardContent>
       </Card>
@@ -33,9 +61,8 @@ export const NewcomerDashboard = () => {
           <div className="space-y-4">
             <h3 className="font-medium">Interne Informationen</h3>
             <p className="text-gray-600">
-              Hier finden Sie wichtige interne Dokumente und Informationen.
+              Hier findest du wichtige interne Dokumente und Informationen.
             </p>
-            {/* Add intranet content here */}
           </div>
         </CardContent>
       </Card>
