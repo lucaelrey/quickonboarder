@@ -6,14 +6,12 @@ import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { ApplicationSteps } from "@/components/apply/ApplicationSteps";
 import { Loader2 } from "lucide-react";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const Apply = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [profile, setProfile] = useState<{ id: string } | null>(null);
   const [loading, setLoading] = useState(true);
-  const [hasExistingApplication, setHasExistingApplication] = useState(false);
 
   useEffect(() => {
     const checkProfile = async () => {
@@ -27,31 +25,6 @@ const Apply = () => {
         }
 
         console.log("Checking profile for user:", user.id);
-        
-        // First check if user already has an application
-        const { data: existingApplication, error: applicationError } = await supabase
-          .from("applications")
-          .select("id")
-          .eq("user_id", user.id)
-          .maybeSingle();
-
-        if (applicationError) {
-          console.error("Error checking existing application:", applicationError);
-          toast({
-            title: "Fehler",
-            description: "Fehler beim Prüfen bestehender Bewerbungen. Bitte versuchen Sie es später erneut.",
-            variant: "destructive",
-          });
-          return;
-        }
-
-        if (existingApplication) {
-          console.log("Existing application found:", existingApplication);
-          setHasExistingApplication(true);
-          setLoading(false);
-          return;
-        }
-
         const { data: profile, error } = await supabase
           .from("profiles")
           .select("id")
@@ -97,35 +70,6 @@ const Apply = () => {
         <Navbar />
         <div className="container mx-auto px-4 py-8 flex justify-center items-center">
           <Loader2 className="h-8 w-8 animate-spin" />
-        </div>
-      </div>
-    );
-  }
-
-  if (hasExistingApplication) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <Navbar />
-        <div className="container mx-auto px-4 py-8">
-          <Card className="max-w-2xl mx-auto">
-            <CardHeader>
-              <CardTitle>Bewerbung</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Alert>
-                <AlertDescription>
-                  Sie haben bereits eine Bewerbung eingereicht. Sie können Ihre Bewerbung im{" "}
-                  <a 
-                    href="/dashboard" 
-                    className="font-medium underline underline-offset-4 hover:text-primary"
-                  >
-                    Dashboard
-                  </a>{" "}
-                  einsehen.
-                </AlertDescription>
-              </Alert>
-            </CardContent>
-          </Card>
         </div>
       </div>
     );
