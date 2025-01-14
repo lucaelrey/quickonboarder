@@ -1,19 +1,21 @@
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { FileText, ChevronRight } from "lucide-react";
 import { format } from "date-fns";
 import { de } from "date-fns/locale";
 import type { Database } from "@/integrations/supabase/types";
+import { ApplicationDetails } from "./ApplicationDetails";
+import { useState } from "react";
 
 type Application = Database['public']['Tables']['applications']['Row'];
 
 interface ApplicantDashboardProps {
   application: Application;
-  onViewDetails: () => void;
 }
 
-export const ApplicantDashboard = ({ application, onViewDetails }: ApplicantDashboardProps) => {
+export const ApplicantDashboard = ({ application }: ApplicantDashboardProps) => {
+  const [showDetails, setShowDetails] = useState(false);
+
   const formatDate = (dateString: string | null) => {
     if (!dateString) return "-";
     try {
@@ -42,8 +44,12 @@ export const ApplicantDashboard = ({ application, onViewDetails }: ApplicantDash
     );
   };
 
+  if (showDetails) {
+    return <ApplicationDetails application={application} onBack={() => setShowDetails(false)} />;
+  }
+
   return (
-    <Card className="cursor-pointer hover:bg-gray-50 transition-colors" onClick={onViewDetails}>
+    <Card className="cursor-pointer hover:bg-gray-50 transition-colors" onClick={() => setShowDetails(true)}>
       <CardContent className="pt-6">
         <div className="flex justify-between items-center">
           <div className="space-y-2">
