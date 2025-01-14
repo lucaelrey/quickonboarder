@@ -24,7 +24,7 @@ export const LoginForm = ({ onShowRegistration }: LoginFormProps) => {
           title: "Abgemeldet",
           description: "Sie wurden erfolgreich abgemeldet.",
         });
-      } else if (event === "USER_DELETED" || event === "TOKEN_REFRESHED" || event === "PASSWORD_RECOVERY") {
+      } else if (event === "TOKEN_REFRESHED" || event === "PASSWORD_RECOVERY") {
         // Handle other auth events if needed
       }
     });
@@ -37,6 +37,7 @@ export const LoginForm = ({ onShowRegistration }: LoginFormProps) => {
       <Auth
         supabaseClient={supabase}
         appearance={{
+          theme: ThemeSupa,
           style: {
             button: {
               background: '#0077ff',
