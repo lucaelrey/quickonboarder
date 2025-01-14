@@ -4,9 +4,13 @@ import { Link } from "react-router-dom";
 export const Navbar = () => {
   return (
     <nav className="border-b bg-white">
-      <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+      <div className="container mx-auto px-4 flex items-center justify-between">
         <Link to="/" className="flex items-center space-x-2">
-          <span className="text-2xl font-bold text-primary">Quickmail</span>
+          <img 
+            src="/lovable-uploads/8294c711-1f00-4f39-bdd8-771770011abf.png" 
+            alt="Quickmail Logo" 
+            className="h-16 object-contain"
+          />
         </Link>
         <div className="flex items-center space-x-4">
           <Link to="/apply">
