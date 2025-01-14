@@ -36,6 +36,7 @@ export type Database = {
           preferred_language:
             | Database["public"]["Enums"]["preferred_language"]
             | null
+          profile_id: string | null
           salutation: string | null
           street: string | null
           user_id: string | null
@@ -67,6 +68,7 @@ export type Database = {
           preferred_language?:
             | Database["public"]["Enums"]["preferred_language"]
             | null
+          profile_id?: string | null
           salutation?: string | null
           street?: string | null
           user_id?: string | null
@@ -98,10 +100,49 @@ export type Database = {
           preferred_language?:
             | Database["public"]["Enums"]["preferred_language"]
             | null
+          profile_id?: string | null
           salutation?: string | null
           street?: string | null
           user_id?: string | null
           vehicles?: string[] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "applications_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string | null
+          email: string
+          first_name: string
+          id: string
+          last_name: string
+          phone: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          first_name: string
+          id?: string
+          last_name: string
+          phone: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          first_name?: string
+          id?: string
+          last_name?: string
+          phone?: string
+          user_id?: string
         }
         Relationships: []
       }
