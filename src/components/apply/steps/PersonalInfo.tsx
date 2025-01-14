@@ -6,11 +6,12 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { CalendarIcon } from "lucide-react";
-import { format } from "date-fns";
+import { format, parse, isValid } from "date-fns";
 import { de } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import countries from "@/data/countries.json";
 import { Separator } from "@/components/ui/separator";
+import { useState } from "react";
 
 interface PersonalInfoProps {
   formData: any;
@@ -18,6 +19,22 @@ interface PersonalInfoProps {
 }
 
 export const PersonalInfo = ({ formData, updateFormData }: PersonalInfoProps) => {
+  const [dateInput, setDateInput] = useState(
+    formData.birthDate ? format(formData.birthDate, "dd.MM.yyyy") : ""
+  );
+
+  const handleDateInputChange = (value: string) => {
+    setDateInput(value);
+    
+    // Try to parse the manually entered date
+    if (value.length === 10) { // Only try to parse if the input is complete (DD.MM.YYYY)
+      const parsedDate = parse(value, "dd.MM.yyyy", new Date());
+      if (isValid(parsedDate)) {
+        updateFormData({ birthDate: parsedDate });
+      }
+    }
+  };
+
   return (
     <Card>
       <CardContent className="pt-6 space-y-4">
@@ -72,33 +89,47 @@ export const PersonalInfo = ({ formData, updateFormData }: PersonalInfoProps) =>
 
         <div className="space-y-2">
           <Label>Geburtstag</Label>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className={cn(
-                  "w-full justify-start text-left font-normal",
-                  !formData.birthDate && "text-muted-foreground"
-                )}
-              >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {formData.birthDate ? (
-                  format(formData.birthDate, "P", { locale: de })
-                ) : (
-                  <span>Datum auswählen</span>
-                )}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0">
-              <Calendar
-                mode="single"
-                selected={formData.birthDate}
-                onSelect={(date) => updateFormData({ birthDate: date })}
-                initialFocus
-                locale={de}
-              />
-            </PopoverContent>
-          </Popover>
+          <div className="flex gap-2">
+            <Input
+              type="text"
+              placeholder="TT.MM.JJJJ"
+              value={dateInput}
+              onChange={(e) => handleDateInputChange(e.target.value)}
+              className="w-full"
+            />
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "w-[280px]",
+                    !formData.birthDate && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {formData.birthDate ? (
+                    format(formData.birthDate, "P", { locale: de })
+                  ) : (
+                    <span>Datum auswählen</span>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0">
+                <Calendar
+                  mode="single"
+                  selected={formData.birthDate}
+                  onSelect={(date) => {
+                    updateFormData({ birthDate: date });
+                    if (date) {
+                      setDateInput(format(date, "dd.MM.yyyy"));
+                    }
+                  }}
+                  initialFocus
+                  locale={de}
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
         </div>
 
         <div className="space-y-2">
