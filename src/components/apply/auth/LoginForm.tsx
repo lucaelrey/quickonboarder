@@ -3,6 +3,7 @@ import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect } from "react";
+import { AuthError } from "@supabase/supabase-js";
 
 interface LoginFormProps {
   onShowRegistration: () => void;
@@ -12,13 +13,19 @@ export const LoginForm = ({ onShowRegistration }: LoginFormProps) => {
   const { toast } = useToast();
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'AUTH_ERROR') {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "SIGNED_IN") {
         toast({
-          title: "Fehler",
-          description: "Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.",
-          variant: "destructive",
+          title: "Erfolgreich angemeldet",
+          description: "Sie wurden erfolgreich angemeldet.",
         });
+      } else if (event === "SIGNED_OUT") {
+        toast({
+          title: "Abgemeldet",
+          description: "Sie wurden erfolgreich abgemeldet.",
+        });
+      } else if (event === "USER_DELETED" || event === "TOKEN_REFRESHED" || event === "PASSWORD_RECOVERY") {
+        // Handle other auth events if needed
       }
     });
 
