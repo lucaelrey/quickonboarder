@@ -4,7 +4,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { AuthError } from "@supabase/supabase-js";
 
 interface RegistrationFormProps {
   onShowLogin: () => void;
@@ -39,7 +38,31 @@ export const RegistrationForm = ({ onShowLogin, onProfileCreated }: Registration
     }
 
     try {
-      // Try to sign up the user first
+      // First, check if there's an existing profile with this email
+      const { data: existingProfiles } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("email", formData.email);
+
+      // If there's an existing profile, delete it first
+      if (existingProfiles && existingProfiles.length > 0) {
+        const { error: deleteError } = await supabase
+          .from("profiles")
+          .delete()
+          .eq("email", formData.email);
+
+        if (deleteError) {
+          console.error("Error deleting existing profile:", deleteError);
+          toast({
+            title: "Fehler",
+            description: "Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.",
+            variant: "destructive",
+          });
+          return;
+        }
+      }
+
+      // Try to sign up the user
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
@@ -52,23 +75,12 @@ export const RegistrationForm = ({ onShowLogin, onProfileCreated }: Registration
       });
 
       if (authError) {
-        // Handle user already exists error
-        if (authError.message.includes("user_already_exists")) {
-          toast({
-            title: "Hinweis",
-            description: "Diese E-Mail-Adresse ist bereits registriert. Bitte melden Sie sich stattdessen an.",
-          });
-          onShowLogin();
-          return;
-        }
-
-        // Handle other auth errors
+        console.error("Auth error:", authError);
         toast({
           title: "Fehler",
-          description: "Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.",
+          description: "Ein Fehler ist aufgetreten bei der Registrierung. Bitte versuchen Sie es später erneut.",
           variant: "destructive",
         });
-        console.error("Auth error:", authError);
         return;
       }
 
