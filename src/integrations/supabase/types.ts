@@ -11,61 +11,97 @@ export type Database = {
     Tables: {
       applications: {
         Row: {
+          address_addition: string | null
+          available_workdays: string[] | null
           birth_date: string | null
+          city: string | null
           civil_status: Database["public"]["Enums"]["civil_status"] | null
           created_at: string | null
+          current_occupation: string | null
           email: string
           first_name: string
           french_level: Database["public"]["Enums"]["language_level"] | null
           german_level: Database["public"]["Enums"]["language_level"] | null
+          has_delivery_experience: boolean | null
+          house_number: string | null
           id: string
           italian_level: Database["public"]["Enums"]["language_level"] | null
+          job_source: string | null
           last_name: string
+          max_workload: string | null
+          min_workload: string | null
           nationality: string | null
           phone: string
+          postal_code: string | null
           preferred_language:
             | Database["public"]["Enums"]["preferred_language"]
             | null
           salutation: string | null
+          street: string | null
           user_id: string | null
+          vehicles: string[] | null
         }
         Insert: {
+          address_addition?: string | null
+          available_workdays?: string[] | null
           birth_date?: string | null
+          city?: string | null
           civil_status?: Database["public"]["Enums"]["civil_status"] | null
           created_at?: string | null
+          current_occupation?: string | null
           email: string
           first_name: string
           french_level?: Database["public"]["Enums"]["language_level"] | null
           german_level?: Database["public"]["Enums"]["language_level"] | null
+          has_delivery_experience?: boolean | null
+          house_number?: string | null
           id?: string
           italian_level?: Database["public"]["Enums"]["language_level"] | null
+          job_source?: string | null
           last_name: string
+          max_workload?: string | null
+          min_workload?: string | null
           nationality?: string | null
           phone: string
+          postal_code?: string | null
           preferred_language?:
             | Database["public"]["Enums"]["preferred_language"]
             | null
           salutation?: string | null
+          street?: string | null
           user_id?: string | null
+          vehicles?: string[] | null
         }
         Update: {
+          address_addition?: string | null
+          available_workdays?: string[] | null
           birth_date?: string | null
+          city?: string | null
           civil_status?: Database["public"]["Enums"]["civil_status"] | null
           created_at?: string | null
+          current_occupation?: string | null
           email?: string
           first_name?: string
           french_level?: Database["public"]["Enums"]["language_level"] | null
           german_level?: Database["public"]["Enums"]["language_level"] | null
+          has_delivery_experience?: boolean | null
+          house_number?: string | null
           id?: string
           italian_level?: Database["public"]["Enums"]["language_level"] | null
+          job_source?: string | null
           last_name?: string
+          max_workload?: string | null
+          min_workload?: string | null
           nationality?: string | null
           phone?: string
+          postal_code?: string | null
           preferred_language?:
             | Database["public"]["Enums"]["preferred_language"]
             | null
           salutation?: string | null
+          street?: string | null
           user_id?: string | null
+          vehicles?: string[] | null
         }
         Relationships: []
       }

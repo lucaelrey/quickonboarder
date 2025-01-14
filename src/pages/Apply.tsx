@@ -15,6 +15,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import countries from "../data/countries.json";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const Apply = () => {
   const { toast } = useToast();
@@ -32,6 +33,18 @@ const Apply = () => {
     germanLevel: "",
     frenchLevel: "",
     italianLevel: "",
+    street: "",
+    houseNumber: "",
+    addressAddition: "",
+    postalCode: "",
+    city: "",
+    currentOccupation: "",
+    minWorkload: "",
+    maxWorkload: "",
+    availableWorkdays: [] as string[],
+    vehicles: [] as string[],
+    hasDeliveryExperience: false,
+    jobSource: "",
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -66,6 +79,15 @@ const Apply = () => {
     }));
   };
 
+  const handleCheckboxChange = (value: string, field: "availableWorkdays" | "vehicles") => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: prev[field].includes(value)
+        ? prev[field].filter((item) => item !== value)
+        : [...prev[field], value],
+    }));
+  };
+
   const handleNext = async () => {
     if (step === 1) {
       if (!formData.firstName || !formData.lastName || !formData.email || !formData.phone) {
@@ -81,6 +103,28 @@ const Apply = () => {
       if (!formData.salutation || !formData.civilStatus || !formData.birthDate || 
           !formData.nationality || !formData.preferredLanguage || 
           !formData.germanLevel || !formData.frenchLevel || !formData.italianLevel) {
+        toast({
+          title: "Fehler",
+          description: "Bitte füllen Sie alle Pflichtfelder aus.",
+          variant: "destructive",
+        });
+        return;
+      }
+      setStep(3);
+    } else if (step === 3) {
+      if (!formData.street || !formData.houseNumber || !formData.postalCode || !formData.city) {
+        toast({
+          title: "Fehler",
+          description: "Bitte füllen Sie alle Pflichtfelder aus.",
+          variant: "destructive",
+        });
+        return;
+      }
+      setStep(4);
+    } else if (step === 4) {
+      if (!formData.currentOccupation || !formData.minWorkload || !formData.maxWorkload || 
+          formData.availableWorkdays.length === 0 || formData.vehicles.length === 0 || 
+          !formData.jobSource) {
         toast({
           title: "Fehler",
           description: "Bitte füllen Sie alle Pflichtfelder aus.",
@@ -116,6 +160,18 @@ const Apply = () => {
             german_level: formData.germanLevel,
             french_level: formData.frenchLevel,
             italian_level: formData.italianLevel,
+            street: formData.street,
+            house_number: formData.houseNumber,
+            address_addition: formData.addressAddition,
+            postal_code: formData.postalCode,
+            city: formData.city,
+            current_occupation: formData.currentOccupation,
+            min_workload: formData.minWorkload,
+            max_workload: formData.maxWorkload,
+            available_workdays: formData.availableWorkdays,
+            vehicles: formData.vehicles,
+            has_delivery_experience: formData.hasDeliveryExperience,
+            job_source: formData.jobSource,
           });
 
         if (error) throw error;
@@ -135,6 +191,61 @@ const Apply = () => {
     }
   };
 
+  const workloadOptions = [
+    "10 % (½ Tag pro Woche)",
+    "20 % (1 Tag pro Woche)",
+    "30% (1½ Tage pro Woche)",
+    "40 % (2 Tage pro Woche)",
+    "50 % (2½ Tage pro Woche)",
+    "60 % (3 Tage pro Woche)",
+    "70 % (3½ Tage pro Woche)",
+    "80 % (4 Tage pro Woche)",
+    "90 % (4½ Tage pro Woche)",
+    "100 % (5 Tage pro Woche)",
+  ];
+
+  const occupationOptions = [
+    "haushaltsführende Person",
+    "in Schichtarbeit",
+    "teilzeitbeschäftigt",
+    "vollzeitbeschäftigt",
+    "pensioniert",
+    "arbeitssuchend",
+    "Student:in",
+    "Schüler:in",
+    "Sonstiges",
+  ];
+
+  const workdayOptions = [
+    "Donnerstagvormittag",
+    "Donnerstagnachmittag",
+    "Freitagvormittag",
+    "Freitagnachmittag",
+    "Samstagvormittag (gelegentlich)",
+  ];
+
+  const vehicleOptions = [
+    "Fahrrad",
+    "E-Bike",
+    "Mofa",
+    "Motorrad",
+    "Auto",
+    "Keines",
+  ];
+
+  const jobSourceOptions = [
+    "Facebook",
+    "Google",
+    "Instagram",
+    "Jobbörse im Internet",
+    "Empfehlung durch Bekannte",
+    "Empfehlung durch Quickmail-Zusteller:in",
+    "Stelleninserat in Zeitung",
+    "Flugblatt in meinem Briefkasten",
+    "RAV Regionales Arbeitsvermittlungszentrum",
+    "Sonstiges",
+  ];
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
@@ -146,7 +257,7 @@ const Apply = () => {
           <CardContent>
             <div className="mb-6">
               <div className="flex items-center justify-between mb-2">
-                {[1, 2].map((stepNumber) => (
+                {[1, 2, 3, 4].map((stepNumber) => (
                   <div
                     key={stepNumber}
                     className={`w-8 h-8 rounded-full flex items-center justify-center ${
@@ -162,7 +273,7 @@ const Apply = () => {
               <div className="h-2 bg-gray-200 rounded-full">
                 <div
                   className="h-full bg-primary rounded-full transition-all duration-300"
-                  style={{ width: `${((step - 1) / 1) * 100}%` }}
+                  style={{ width: `${((step - 1) / 3) * 100}%` }}
                 />
               </div>
             </div>
@@ -405,6 +516,210 @@ const Apply = () => {
               </div>
             )}
 
+            {step === 3 && (
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="street">Strasse</Label>
+                    <Input
+                      id="street"
+                      name="street"
+                      value={formData.street}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="houseNumber">Hausnummer</Label>
+                    <Input
+                      id="houseNumber"
+                      name="houseNumber"
+                      value={formData.houseNumber}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="addressAddition">Zusatz</Label>
+                  <Input
+                    id="addressAddition"
+                    name="addressAddition"
+                    value={formData.addressAddition}
+                    onChange={handleInputChange}
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="postalCode">PLZ</Label>
+                    <Input
+                      id="postalCode"
+                      name="postalCode"
+                      value={formData.postalCode}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="city">Ort</Label>
+                    <Input
+                      id="city"
+                      name="city"
+                      value={formData.city}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {step === 4 && (
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Derzeitige Beschäftigung</Label>
+                  <Select
+                    value={formData.currentOccupation}
+                    onValueChange={(value) => handleSelectChange("currentOccupation", value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Bitte wählen" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {occupationOptions.map((option) => (
+                        <SelectItem key={option} value={option}>
+                          {option}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Gewünschtes Arbeitspensum</Label>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>Mindestens</Label>
+                      <Select
+                        value={formData.minWorkload}
+                        onValueChange={(value) => handleSelectChange("minWorkload", value)}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Bitte wählen" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {workloadOptions.map((option) => (
+                            <SelectItem key={option} value={option}>
+                              {option}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Höchstens</Label>
+                      <Select
+                        value={formData.maxWorkload}
+                        onValueChange={(value) => handleSelectChange("maxWorkload", value)}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Bitte wählen" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {workloadOptions.map((option) => (
+                            <SelectItem key={option} value={option}>
+                              {option}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Mögliche Arbeitstage</Label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {workdayOptions.map((day) => (
+                      <div key={day} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={day}
+                          checked={formData.availableWorkdays.includes(day)}
+                          onCheckedChange={(checked) => {
+                            if (checked) {
+                              handleCheckboxChange(day, "availableWorkdays");
+                            }
+                          }}
+                        />
+                        <Label htmlFor={day}>{day}</Label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Ich verfüge über folgende Fahrzeuge</Label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {vehicleOptions.map((vehicle) => (
+                      <div key={vehicle} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={vehicle}
+                          checked={formData.vehicles.includes(vehicle)}
+                          onCheckedChange={(checked) => {
+                            if (checked) {
+                              handleCheckboxChange(vehicle, "vehicles");
+                            }
+                          }}
+                        />
+                        <Label htmlFor={vehicle}>{vehicle}</Label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Ich verfüge bereits über Erfahrung als Zusteller:in</Label>
+                  <RadioGroup
+                    value={formData.hasDeliveryExperience ? "yes" : "no"}
+                    onValueChange={(value) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        hasDeliveryExperience: value === "yes",
+                      }))
+                    }
+                  >
+                    <div className="flex space-x-4">
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="yes" id="yes" />
+                        <Label htmlFor="yes">Ja</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="no" id="no" />
+                        <Label htmlFor="no">Nein</Label>
+                      </div>
+                    </div>
+                  </RadioGroup>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Wie hast du vom Stellenangebot erfahren?</Label>
+                  <Select
+                    value={formData.jobSource}
+                    onValueChange={(value) => handleSelectChange("jobSource", value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Bitte wählen" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {jobSourceOptions.map((option) => (
+                        <SelectItem key={option} value={option}>
+                          {option}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            )}
+
             <div className="pt-4 flex justify-between">
               {step > 1 && (
                 <Button
@@ -418,7 +733,7 @@ const Apply = () => {
                 onClick={handleNext}
                 className={cn(step === 1 ? "w-full" : "ml-auto")}
               >
-                {step === 2 ? "Absenden" : "Weiter"}
+                {step === 4 ? "Absenden" : "Weiter"}
               </Button>
             </div>
           </CardContent>
