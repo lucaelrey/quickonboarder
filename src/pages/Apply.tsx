@@ -92,21 +92,23 @@ const Apply = () => {
           return;
         }
 
-        const { error } = await supabase.from("applications").insert({
-          user_id: user.id,
-          first_name: formData.firstName,
-          last_name: formData.lastName,
-          email: formData.email,
-          phone: formData.phone,
-          salutation: formData.salutation,
-          civil_status: formData.civilStatus,
-          birth_date: formData.birthDate,
-          nationality: formData.nationality,
-          preferred_language: formData.preferredLanguage,
-          german_level: formData.germanLevel,
-          french_level: formData.frenchLevel,
-          italian_level: formData.italianLevel,
-        });
+        const { error } = await supabase
+          .from("applications")
+          .insert({
+            user_id: user.id,
+            first_name: formData.firstName,
+            last_name: formData.lastName,
+            email: formData.email,
+            phone: formData.phone,
+            salutation: formData.salutation,
+            civil_status: formData.civilStatus,
+            birth_date: formData.birthDate?.toISOString(),
+            nationality: formData.nationality,
+            preferred_language: formData.preferredLanguage,
+            german_level: formData.germanLevel,
+            french_level: formData.frenchLevel,
+            italian_level: formData.italianLevel,
+          });
 
         if (error) throw error;
 
@@ -124,6 +126,8 @@ const Apply = () => {
       }
     }
   };
+
+  // ... keep existing code (rest of the component JSX)
 
   return (
     <div className="min-h-screen bg-gray-50">
