@@ -7,6 +7,7 @@ import { ProfileForm } from "@/components/apply/ProfileForm";
 import { ApplicationSteps } from "@/components/apply/ApplicationSteps";
 import { Button } from "@/components/ui/button";
 import { useSearchParams } from "react-router-dom";
+import { Loader2 } from "lucide-react";
 
 const Apply = () => {
   const { toast } = useToast();
@@ -14,12 +15,16 @@ const Apply = () => {
   const [showApplicationForm, setShowApplicationForm] = useState(false);
   const [searchParams] = useSearchParams();
   const [showLogin, setShowLogin] = useState(searchParams.get("form") === "login");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
         const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
+        if (!user) {
+          setLoading(false);
+          return;
+        }
 
         const { data: profile, error } = await supabase
           .from("profiles")
@@ -27,7 +32,7 @@ const Apply = () => {
           .eq("user_id", user.id)
           .maybeSingle();
 
-        if (error) {
+        if (error && error.code !== 'PGRST116') {
           console.error("Error fetching profile:", error);
           toast({
             title: "Fehler",
@@ -37,7 +42,12 @@ const Apply = () => {
           return;
         }
 
-        setProfile(profile);
+        if (profile) {
+          setProfile(profile);
+          // If coming from dashboard (already has profile), show application form directly
+          const fromDashboard = searchParams.get("from") === "dashboard";
+          setShowApplicationForm(fromDashboard);
+        }
       } catch (error) {
         console.error("Error fetching profile:", error);
         toast({
@@ -45,6 +55,8 @@ const Apply = () => {
           description: "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.",
           variant: "destructive",
         });
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -61,6 +73,17 @@ const Apply = () => {
 
     return () => subscription.unsubscribe();
   }, [toast]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Navbar />
+        <div className="container mx-auto px-4 py-8 flex justify-center items-center">
+          <Loader2 className="h-8 w-8 animate-spin" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">

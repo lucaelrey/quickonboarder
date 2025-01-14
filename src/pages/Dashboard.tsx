@@ -67,7 +67,7 @@ const Dashboard = () => {
             {!application ? (
               <div className="text-center">
                 <p className="mb-4">Sie haben noch keine Bewerbung eingereicht.</p>
-                <Button onClick={() => navigate("/apply")}>
+                <Button onClick={() => navigate("/apply?from=dashboard")}>
                   Jetzt bewerben
                 </Button>
               </div>
