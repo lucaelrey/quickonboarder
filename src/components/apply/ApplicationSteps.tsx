@@ -6,6 +6,9 @@ import { ContactInfo } from "./steps/ContactInfo";
 import { AddressInfo } from "./steps/AddressInfo";
 import { WorkInfo } from "./steps/WorkInfo";
 import { supabase } from "@/integrations/supabase/client";
+import type { Database } from "@/integrations/supabase/types";
+
+type ApplicationInsert = Database['public']['Tables']['applications']['Insert'];
 
 export const ApplicationSteps = ({ profileId }: { profileId: string }) => {
   const { toast } = useToast();
@@ -42,31 +45,33 @@ export const ApplicationSteps = ({ profileId }: { profileId: string }) => {
       setStep(step + 1);
     } else {
       try {
+        const applicationData: ApplicationInsert = {
+          profile_id: profileId,
+          salutation: formData.salutation,
+          civil_status: formData.civilStatus as Database['public']['Enums']['civil_status'],
+          birth_date: formData.birthDate?.toISOString(),
+          nationality: formData.nationality,
+          preferred_language: formData.preferredLanguage as Database['public']['Enums']['preferred_language'],
+          german_level: formData.germanLevel as Database['public']['Enums']['language_level'],
+          french_level: formData.frenchLevel as Database['public']['Enums']['language_level'],
+          italian_level: formData.italianLevel as Database['public']['Enums']['language_level'],
+          street: formData.street,
+          house_number: formData.houseNumber,
+          address_addition: formData.addressAddition,
+          postal_code: formData.postalCode,
+          city: formData.city,
+          current_occupation: formData.currentOccupation,
+          min_workload: formData.minWorkload,
+          max_workload: formData.maxWorkload,
+          available_workdays: formData.availableWorkdays,
+          vehicles: formData.vehicles,
+          has_delivery_experience: formData.hasDeliveryExperience,
+          job_source: formData.jobSource,
+        };
+
         const { error } = await supabase
-          .from("applications")
-          .insert({
-            profile_id: profileId,
-            salutation: formData.salutation,
-            civil_status: formData.civilStatus,
-            birth_date: formData.birthDate?.toISOString(),
-            nationality: formData.nationality,
-            preferred_language: formData.preferredLanguage,
-            german_level: formData.germanLevel,
-            french_level: formData.frenchLevel,
-            italian_level: formData.italianLevel,
-            street: formData.street,
-            house_number: formData.houseNumber,
-            address_addition: formData.addressAddition,
-            postal_code: formData.postalCode,
-            city: formData.city,
-            current_occupation: formData.currentOccupation,
-            min_workload: formData.minWorkload,
-            max_workload: formData.maxWorkload,
-            available_workdays: formData.availableWorkdays,
-            vehicles: formData.vehicles,
-            has_delivery_experience: formData.hasDeliveryExperience,
-            job_source: formData.jobSource,
-          });
+          .from('applications')
+          .insert(applicationData);
 
         if (error) throw error;
 
