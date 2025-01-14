@@ -28,13 +28,6 @@ export const RegistrationForm = ({ onShowLogin, onProfileCreated }: Registration
     }));
   };
 
-  const getErrorMessage = (error: AuthError) => {
-    if (error.message.includes("user_already_exists")) {
-      return "Diese E-Mail-Adresse ist bereits registriert. Bitte melden Sie sich stattdessen an.";
-    }
-    return "Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.";
-  };
-
   const handleSubmit = async () => {
     if (!formData.firstName || !formData.lastName || !formData.email || !formData.password) {
       toast({
@@ -46,23 +39,7 @@ export const RegistrationForm = ({ onShowLogin, onProfileCreated }: Registration
     }
 
     try {
-      // First check if a profile with this email already exists
-      const { data: existingProfile } = await supabase
-        .from("profiles")
-        .select("id")
-        .eq("email", formData.email)
-        .maybeSingle();
-
-      if (existingProfile) {
-        toast({
-          title: "Fehler",
-          description: "Diese E-Mail-Adresse ist bereits registriert. Bitte melden Sie sich stattdessen an.",
-          variant: "destructive",
-        });
-        onShowLogin();
-        return;
-      }
-
+      // Try to sign up the user first
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
@@ -75,15 +52,23 @@ export const RegistrationForm = ({ onShowLogin, onProfileCreated }: Registration
       });
 
       if (authError) {
+        // Handle user already exists error
+        if (authError.message.includes("user_already_exists")) {
+          toast({
+            title: "Hinweis",
+            description: "Diese E-Mail-Adresse ist bereits registriert. Bitte melden Sie sich stattdessen an.",
+          });
+          onShowLogin();
+          return;
+        }
+
+        // Handle other auth errors
         toast({
           title: "Fehler",
-          description: getErrorMessage(authError),
+          description: "Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.",
           variant: "destructive",
         });
-        
-        if (authError.message.includes("user_already_exists")) {
-          onShowLogin();
-        }
+        console.error("Auth error:", authError);
         return;
       }
 
@@ -91,6 +76,7 @@ export const RegistrationForm = ({ onShowLogin, onProfileCreated }: Registration
         throw new Error("Benutzer konnte nicht erstellt werden.");
       }
 
+      // Create the profile
       const { error: profileError } = await supabase
         .from("profiles")
         .insert({
@@ -103,7 +89,12 @@ export const RegistrationForm = ({ onShowLogin, onProfileCreated }: Registration
 
       if (profileError) {
         console.error("Error creating profile:", profileError);
-        throw profileError;
+        toast({
+          title: "Fehler",
+          description: "Ein Fehler ist aufgetreten beim Erstellen des Profils.",
+          variant: "destructive",
+        });
+        return;
       }
 
       toast({
@@ -112,10 +103,10 @@ export const RegistrationForm = ({ onShowLogin, onProfileCreated }: Registration
       });
       onProfileCreated();
     } catch (error) {
-      console.error("Error creating profile:", error);
+      console.error("Error in registration process:", error);
       toast({
         title: "Fehler",
-        description: "Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.",
+        description: "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.",
         variant: "destructive",
       });
     }
