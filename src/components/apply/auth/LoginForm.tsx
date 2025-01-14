@@ -66,6 +66,18 @@ export const LoginForm = ({ onShowRegistration }: LoginFormProps) => {
         theme="light"
         providers={[]}
         view="sign_in"
+        localization={{
+          variables: {
+            sign_in: {
+              email_label: 'E-Mail',
+              password_label: 'Passwort',
+              button_label: 'Anmelden',
+              loading_button_label: 'Anmeldung läuft...',
+              social_provider_text: 'Anmelden mit {{provider}}',
+              link_text: '',
+            },
+          },
+        }}
       />
       <div className="text-center mt-4">
         <button
