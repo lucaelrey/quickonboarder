@@ -45,8 +45,22 @@ export const ApplicationSteps = ({ profileId }: { profileId: string }) => {
       setStep(step + 1);
     } else {
       try {
+        // First get the profile data to include required fields
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .select('first_name, last_name, email, phone')
+          .eq('id', profileId)
+          .single();
+
+        if (profileError) throw profileError;
+        if (!profileData) throw new Error('Profile not found');
+
         const applicationData: ApplicationInsert = {
           profile_id: profileId,
+          first_name: profileData.first_name,
+          last_name: profileData.last_name,
+          email: profileData.email,
+          phone: profileData.phone,
           salutation: formData.salutation,
           civil_status: formData.civilStatus as Database['public']['Enums']['civil_status'],
           birth_date: formData.birthDate?.toISOString(),
