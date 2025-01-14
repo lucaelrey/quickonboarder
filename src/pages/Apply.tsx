@@ -36,10 +36,20 @@ const Apply = () => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    if (name === "birthDate") {
+      const date = new Date(value);
+      if (!isNaN(date.getTime())) {
+        setFormData((prev) => ({
+          ...prev,
+          birthDate: date,
+        }));
+      }
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
   };
 
   const handleSelectChange = (name: string, value: string) => {
@@ -58,7 +68,6 @@ const Apply = () => {
 
   const handleNext = async () => {
     if (step === 1) {
-      // Validate step 1
       if (!formData.firstName || !formData.lastName || !formData.email || !formData.phone) {
         toast({
           title: "Fehler",
@@ -69,7 +78,6 @@ const Apply = () => {
       }
       setStep(2);
     } else if (step === 2) {
-      // Validate step 2
       if (!formData.salutation || !formData.civilStatus || !formData.birthDate || 
           !formData.nationality || !formData.preferredLanguage || 
           !formData.germanLevel || !formData.frenchLevel || !formData.italianLevel) {
@@ -126,8 +134,6 @@ const Apply = () => {
       }
     }
   };
-
-  // ... keep existing code (rest of the component JSX)
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -227,6 +233,10 @@ const Apply = () => {
                         <RadioGroupItem value="Frau" id="frau" />
                         <Label htmlFor="frau">Frau</Label>
                       </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="Divers" id="divers" />
+                        <Label htmlFor="divers">Divers</Label>
+                      </div>
                     </div>
                   </RadioGroup>
                 </div>
@@ -255,33 +265,42 @@ const Apply = () => {
 
                 <div className="space-y-2">
                   <Label>Geburtstag</Label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className={cn(
-                          "w-full justify-start text-left font-normal",
-                          !formData.birthDate && "text-muted-foreground"
-                        )}
-                      >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {formData.birthDate ? (
-                          format(formData.birthDate, "P", { locale: de })
-                        ) : (
-                          <span>Datum auswählen</span>
-                        )}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0">
-                      <Calendar
-                        mode="single"
-                        selected={formData.birthDate || undefined}
-                        onSelect={handleDateSelect}
-                        initialFocus
-                        locale={de}
-                      />
-                    </PopoverContent>
-                  </Popover>
+                  <div className="flex space-x-2">
+                    <Input
+                      type="date"
+                      name="birthDate"
+                      value={formData.birthDate ? format(formData.birthDate, 'yyyy-MM-dd') : ''}
+                      onChange={handleInputChange}
+                      className="w-full"
+                    />
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className={cn(
+                            "w-[280px] justify-start text-left font-normal",
+                            !formData.birthDate && "text-muted-foreground"
+                          )}
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {formData.birthDate ? (
+                            format(formData.birthDate, "P", { locale: de })
+                          ) : (
+                            <span>Datum auswählen</span>
+                          )}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0">
+                        <Calendar
+                          mode="single"
+                          selected={formData.birthDate || undefined}
+                          onSelect={handleDateSelect}
+                          initialFocus
+                          locale={de}
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </div>
                 </div>
 
                 <div className="space-y-2">
