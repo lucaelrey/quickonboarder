@@ -62,20 +62,27 @@ export const OnboardingIntro = ({ onComplete }: { onComplete: () => void }) => {
           className="w-full max-w-xl"
         >
           <Card className="p-6 text-center shadow-lg">
-            <p className="text-lg mb-8">{introSteps[currentStep].text}</p>
-            <Button
-              onClick={handleNext}
-              disabled={!canProceed}
-              className="w-full max-w-xs mx-auto"
-            >
-              {currentStep < introSteps.length - 1 ? (
-                <>
-                  Weiter <ArrowRight className="ml-2" />
-                </>
-              ) : (
-                "Los geht's!"
-              )}
-            </Button>
+            <div className="flex flex-col items-center space-y-6">
+              <img
+                src="/lovable-uploads/8f0601dd-1d67-4f11-bdd5-3b74a454519b.png"
+                alt="Quentin - Quickmail Maskottchen"
+                className="w-32 h-32 object-contain mb-4"
+              />
+              <p className="text-lg mb-8">{introSteps[currentStep].text}</p>
+              <Button
+                onClick={handleNext}
+                disabled={!canProceed}
+                className="w-full max-w-xs mx-auto"
+              >
+                {currentStep < introSteps.length - 1 ? (
+                  <>
+                    Weiter <ArrowRight className="ml-2" />
+                  </>
+                ) : (
+                  "Los geht's!"
+                )}
+              </Button>
+            </div>
           </Card>
         </motion.div>
       </AnimatePresence>
