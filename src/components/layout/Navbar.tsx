@@ -61,9 +61,6 @@ export const Navbar = () => {
               <Button variant="default">Anmelden</Button>
             </Link>
           )}
-          <Link to="/dashboard">
-            <Button variant="outline">Admin Login</Button>
-          </Link>
         </div>
       </div>
     </nav>
