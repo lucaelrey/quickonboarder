@@ -127,6 +127,7 @@ export type Database = {
           id: string
           last_name: string
           phone: string
+          role: Database["public"]["Enums"]["user_role"]
           status: string | null
           user_id: string
         }
@@ -137,6 +138,7 @@ export type Database = {
           id?: string
           last_name: string
           phone: string
+          role?: Database["public"]["Enums"]["user_role"]
           status?: string | null
           user_id: string
         }
@@ -147,6 +149,7 @@ export type Database = {
           id?: string
           last_name?: string
           phone?: string
+          role?: Database["public"]["Enums"]["user_role"]
           status?: string | null
           user_id?: string
         }
@@ -179,6 +182,7 @@ export type Database = {
         | "Ein wenig"
         | "Keine"
       preferred_language: "Deutsch" | "Französisch" | "Italienisch" | "Andere"
+      user_role: "bewerber" | "newcomer" | "mitarbeiter" | "gekuendigt"
     }
     CompositeTypes: {
       [_ in never]: never
