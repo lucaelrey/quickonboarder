@@ -1,4 +1,9 @@
 [
+  {"name": "Schweiz", "code": "CH"},
+  {"name": "Deutschland", "code": "DE"},
+  {"name": "Österreich", "code": "AT"},
+  {"name": "Liechtenstein", "code": "LI"},
+  {"name": "separator", "code": "separator"},
   {"name": "Afghanistan", "code": "AF"},
   {"name": "Albanien", "code": "AL"},
   {"name": "Algerien", "code": "DZ"},

@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { de } from "date-fns/locale";
@@ -34,6 +35,16 @@ export const PersonalInfo = ({ formData, updateFormData }: PersonalInfoProps) =>
               <SelectItem value="Divers">Divers</SelectItem>
             </SelectContent>
           </Select>
+        </div>
+
+        <div className="space-y-2">
+          <Label>Telefon</Label>
+          <Input
+            type="tel"
+            value={formData.phone || ""}
+            onChange={(e) => updateFormData({ phone: e.target.value })}
+            placeholder="+41 XX XXX XX XX"
+          />
         </div>
 
         <div className="space-y-2">
@@ -100,9 +111,13 @@ export const PersonalInfo = ({ formData, updateFormData }: PersonalInfoProps) =>
             </SelectTrigger>
             <SelectContent>
               {countries.map((country) => (
-                <SelectItem key={country.code} value={country.name}>
-                  {country.name}
-                </SelectItem>
+                country.code === "separator" ? (
+                  <SelectItem key="separator" value="" disabled className="h-[1px] my-2 bg-gray-200" />
+                ) : (
+                  <SelectItem key={country.code} value={country.name}>
+                    {country.name}
+                  </SelectItem>
+                )
               ))}
             </SelectContent>
           </Select>
