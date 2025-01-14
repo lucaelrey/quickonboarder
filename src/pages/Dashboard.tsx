@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 import { format } from "date-fns";
 import { de } from "date-fns/locale";
+import { useToast } from "@/components/ui/use-toast";
 
 type Application = Database['public']['Tables']['applications']['Row'];
 
@@ -15,48 +16,52 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const [application, setApplication] = useState<Application | null>(null);
   const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
 
   useEffect(() => {
     const fetchApplication = async () => {
       try {
         const { data: { user } } = await supabase.auth.getUser();
+        
         if (!user) {
+          console.log("No authenticated user found");
           navigate('/apply?form=login');
           return;
         }
 
+        console.log("Fetching application for user:", user.id);
         const { data, error } = await supabase
           .from('applications')
           .select('*')
           .eq('user_id', user.id)
           .maybeSingle();
 
-        if (error && error.code !== 'PGRST116') {
+        if (error) {
           console.error("Error fetching application:", error);
+          toast({
+            title: "Fehler beim Laden",
+            description: "Ihre Bewerbung konnte nicht geladen werden. Bitte versuchen Sie es später erneut.",
+            variant: "destructive",
+          });
           return;
         }
 
+        console.log("Fetched application data:", data);
         setApplication(data);
       } catch (error) {
         console.error("Error:", error);
+        toast({
+          title: "Fehler",
+          description: "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.",
+          variant: "destructive",
+        });
       } finally {
         setLoading(false);
       }
     };
 
     fetchApplication();
-  }, [navigate]);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <Navbar />
-        <div className="container mx-auto px-4 py-8 flex justify-center items-center">
-          <Loader2 className="h-8 w-8 animate-spin" />
-        </div>
-      </div>
-    );
-  }
+  }, [navigate, toast]);
 
   const formatDate = (dateString: string | null) => {
     if (!dateString) return "-";
@@ -79,8 +84,12 @@ const Dashboard = () => {
             </div>
           </CardHeader>
           <CardContent>
-            {!application ? (
-              <div className="text-center">
+            {loading ? (
+              <div className="flex justify-center items-center py-8">
+                <Loader2 className="h-8 w-8 animate-spin" />
+              </div>
+            ) : !application ? (
+              <div className="text-center py-8">
                 <p className="mb-4">Sie haben noch keine Bewerbung eingereicht.</p>
                 <Button onClick={() => navigate("/apply?from=dashboard")}>
                   Jetzt bewerben
