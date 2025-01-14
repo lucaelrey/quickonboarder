@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Navbar } from "@/components/layout/Navbar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard, FileText, Loader2, Calendar, Car, Briefcase, Globe2 } from "lucide-react";
+import { LayoutDashboard, FileText, Loader2, Calendar, Car, Briefcase, Globe2, ChevronRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 import { format } from "date-fns";
@@ -16,6 +16,7 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const [application, setApplication] = useState<Application | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showDetails, setShowDetails] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -72,6 +73,21 @@ const Dashboard = () => {
     }
   };
 
+  const ApplicationCard = ({ application }: { application: Application }) => (
+    <Card className="cursor-pointer hover:bg-gray-50 transition-colors" onClick={() => setShowDetails(true)}>
+      <CardContent className="pt-6">
+        <div className="flex justify-between items-center">
+          <div>
+            <h3 className="font-semibold">{application.first_name} {application.last_name}</h3>
+            <p className="text-sm text-gray-500">{application.email}</p>
+            <p className="text-sm text-gray-500">Eingereicht am: {formatDate(application.created_at)}</p>
+          </div>
+          <ChevronRight className="h-5 w-5 text-gray-400" />
+        </div>
+      </CardContent>
+    </Card>
+  );
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
@@ -95,8 +111,19 @@ const Dashboard = () => {
                   Jetzt bewerben
                 </Button>
               </div>
+            ) : !showDetails ? (
+              <div className="space-y-4">
+                <h2 className="text-lg font-semibold mb-4">Ihre Bewerbungen</h2>
+                <ApplicationCard application={application} />
+              </div>
             ) : (
               <div className="space-y-8">
+                <div className="flex justify-between items-center">
+                  <Button variant="ghost" onClick={() => setShowDetails(false)}>
+                    ← Zurück zur Übersicht
+                  </Button>
+                </div>
+                
                 {/* Personal Information */}
                 <div className="space-y-4">
                   <div className="flex items-center gap-2">
