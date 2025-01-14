@@ -1,8 +1,7 @@
-import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Navbar } from "@/components/layout/Navbar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button"; // Added this import
+import { Button } from "@/components/ui/button";
 import { Loader2, LayoutDashboard } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
@@ -11,15 +10,15 @@ import { ApplicantDashboard } from "@/components/dashboard/ApplicantDashboard";
 import { NewcomerDashboard } from "@/components/dashboard/NewcomerDashboard";
 import { EmployeeDashboard } from "@/components/dashboard/EmployeeDashboard";
 
-type Application = Database['public']['Tables']['applications']['Row'];
 type Profile = Database['public']['Tables']['profiles']['Row'];
+type Application = Database['public']['Tables']['applications']['Row'];
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const [application, setApplication] = useState<Application | null>(null);
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const [loading, setLoading] = useState(true);
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [application, setApplication] = useState<Application | null>(null);
 
   useEffect(() => {
     const fetchUserData = async () => {
