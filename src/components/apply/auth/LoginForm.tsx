@@ -20,7 +20,7 @@ export const LoginForm = ({ onShowRegistration }: LoginFormProps) => {
           title: "Erfolgreich angemeldet",
           description: "Sie wurden erfolgreich angemeldet.",
         });
-        navigate("/dashboard");
+        navigate("/onboarding");
       } else if (event === "SIGNED_OUT") {
         toast({
           title: "Abgemeldet",
