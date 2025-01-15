@@ -8,6 +8,7 @@ import CreateProfile from "./pages/CreateProfile";
 import Apply from "./pages/Apply";
 import ApplicationConfirmation from "./pages/ApplicationConfirmation";
 import Dashboard from "./pages/Dashboard";
+import Onboarding from "./pages/Onboarding";
 
 const queryClient = new QueryClient();
 
@@ -23,6 +24,7 @@ const App = () => (
           <Route path="/apply" element={<Apply />} />
           <Route path="/application-confirmation" element={<ApplicationConfirmation />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/onboarding" element={<Onboarding />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
